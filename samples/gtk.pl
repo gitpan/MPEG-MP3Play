@@ -29,6 +29,7 @@ main: {
 	# program exit
 	
 	$mp3 = new MPEG::MP3Play;
+	$mp3->print_xaudio_implementation;
 	
 	# *now* initialize Gtk and create simple window with
 	# progress bar

@@ -3,6 +3,7 @@ const XA_OutputFilter *				T_PTROBJ
 const XA_OutputModule *				T_PTROBJ
 const void *					T_PTROBJ
 void **						T_PTROBJ
+XA_Control *					T_PTROBJ
 XA_Message *					T_PTROBJ
 XA_MessagePtr *					T_PTROBJ
 const unsigned char *				T_PTROBJ

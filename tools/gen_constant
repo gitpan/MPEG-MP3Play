@@ -4,6 +4,14 @@ use strict;
 use FileHandle;
 use Data::Dumper;
 
+my %XAUDIO_MISDEFINED_SYMBOL = (
+	XA_NOTIFY_PRIVATE_DATA => 1,
+	XA_VERSION_ID => 1,
+	XA_VERSION_ID_REVISION => 1,
+	XA_VERSION_ID_MAJOR => 1,
+	XA_VERSION_ID_MINOR => 1,
+);
+
 main: {
 	my $sdk_dir = shift @ARGV;
 
@@ -51,6 +59,7 @@ sub gen_constant {
 	my @enums;
 	my @defines;
 	foreach my $file (@files) {
+		print "open header file: '$file'\n";
 		open (H, $file) or die "can't read $file";
 		my $in_enum;
 		while (<H>) {
@@ -131,12 +140,14 @@ sub gen_code_block {
 	my %switch;
 	
 	foreach my $sym (@$enum_lref) {
+		next if $XAUDIO_MISDEFINED_SYMBOL{$sym};
 		$switch{substr($sym,-1,1)} .= 
 			qq{\t\tif (strEQ(name, "$sym"))\n\t\t\treturn $sym;\n}
 	}
 
 	foreach my $sym (@$define_lref) {
 		next if $sym =~ /^(XA_NOTIFY_DEBUG|XA_NOTIFY_ERROR|XA_NOTIFY_PROGRESS)/;
+		next if $XAUDIO_MISDEFINED_SYMBOL{$sym};
 		$switch{substr($sym,-1,1)} .= 
 			qq{\t\tif (strEQ(name, "$sym"))\n}.
 			qq{#ifdef $sym\n}.

@@ -12,28 +12,35 @@ SYNOPSIS
 DESCRIPTION
     This Perl module enables you to playback MPEG music.
 
-    This README and the documention cover version 0.12 of the
+    This README and the documention cover version 0.14 of the
     MPEG::MP3Play module.
 
 PREREQUISITES
     Xaudio SDK
 
-    MPEG::MP3Play is build against the 3.0.8 version of the Xaudio
-    SDK and uses the async interface of the Xaudio library.
+    MPEG::MP3Play is build against the 3.0.8 and 3.2.1 versions of
+    the Xaudio SDK and uses the async interface of the Xaudio
+    library.
 
-    I don't know if older versions will work properly. The SDK is
-    not part of this distribution, so get and install it first
-    (http://www.xaudio.com/).
+    The SDK is not part of this distribution, so get and install it
+    first (http://www.xaudio.com/).
 
-    ATTENTION: Xaudio Versions 3.2.x DO ACTUALLY NOT WORK
+    ATTENTION: Xaudio Version 3.2.x SUPPORT IS ACTUALLY BETA
 
-    Unfortunately Xaudio changed some internals of the API. These
-    changes are actually bad documented, so it's hard for me to
-    adjust MPEG::MP3Play. Please use 3.0.8 meanwhile.
+    Unfortunately Xaudio changed many internals of the API since
+    version 3.0.0, and many of them are not documented. So I had to
+    hack around, but everything seem to work now. Even so I think
+    3.2.x support is actually beta. If you have problems with this
+    version, please send me an email (see bug report section below)
+    and downgrade to 3.0.x if you can't get sleep ;)
+
+    If you have still problems, also with 3.0.8, please use
+    MPEG::MP3Play version 0.13. This version is absolutely stable in
+    conjunction with Xaudio 3.0.8.
 
     For Linux Users:
 
-    Xaudio removed the 3.0.8 Linux version from their developers
+    Xaudio removed the 3.0.8 Linux version from their developer
     page. Please read and agree to the license restrictions under
     http://www.xaudio.com/developers/license.php and download the
     package from here:
@@ -216,7 +223,7 @@ AUTHOR
     Joern Reder <joern@zyn.de>
 
 COPYRIGHT
-    Copyright (C) 1999-2000 by Joern Reder, All Rights Reserved.
+    Copyright (C) 1999-2001 by Joern Reder, All Rights Reserved.
 
     This library is free software; you can redistribute it and/or
     modify it under the same terms as Perl itself.
@@ -225,14 +232,21 @@ COPYRIGHT
     LICENSE text published on http://www.xaudio.com/.
 
 SEE ALSO
-    perl(1), MPEG::MP3Info.
+    perl(1).
 
 CHANGES
-    $Id: Changes,v 1.25 2001/01/05 13:23:42 joern Exp $
+    $Id: Changes,v 1.26 2001/01/05 22:05:26 joern Exp $
 
     Revision history for Perl extension MPEG::MP3Play.
 
-    0.13  Fri Jan 01 2001, joern
+    0.14. Fri Jan 05 2001, joern
+	- puh, many changes of internal data structures in the 3.2.x
+	  release of Xaudio. Some messages constants were gone, but
+	  I didn't use them anywhere, so this should be no problem.
+	  This version builds well with Xaudio 3.0.8 and 3.2.1 under
+	  my Linux system.
+
+    0.13  Fri Jan 05 2001, joern
 	- added hint about incompatibility to actual Xaudio
 	  releases 3.2.x. Hopefully the Xaudio guys document their
 	  internal changes soon, so I can adjust MPEG::MP3Play...

@@ -1,8 +1,9 @@
 use strict;
 use ExtUtils::MakeMaker;
 use Config;
+use File::Copy;
 
-# $Id: Makefile.PL,v 1.9 2000/09/29 16:42:04 joern Exp $
+# $Id: Makefile.PL,v 1.10 2001/01/05 22:05:31 joern Exp $
 
 my $SDK_DIR = '/usr/local/xaudiosdk';
 
@@ -11,9 +12,18 @@ $| = 1;
 main: {
 	# determine X-Audio SDK directory
 
-	my $sdk_dir = get_sdk_directory();
+	my $sdk_dir = get_sdk_directory(@ARGV);
+	my @sdk_version = get_sdk_version($sdk_dir);
 
-	WriteRunsample();
+	my $xaudio_version;
+	if ( $sdk_version[0] == 2 ) {
+		$xaudio_version = "mp3play_xaudio_version_2_2";
+	} else {
+		$xaudio_version = "mp3play_xaudio_version_0_0";
+	}	
+
+	configure_xaudio_version (@sdk_version);	
+	write_runsample();
 
 	# determine additional libs for this platform
 	my $add_libs = get_add_libs();
@@ -23,19 +33,20 @@ main: {
 
 	WriteMakefile(
 	    'NAME'	=> 'MPEG::MP3Play',
+	    'ABSTRACT'  => 'Module for playing MPEG audio files, needs Xaudio',
 	    'VERSION_FROM' => 'MP3Play.pm',
 	    'LIBS'	=> ["-L$sdk_dir/lib -lxaudio $add_libs"],
-	    'DEFINE'	=> '',
+	    'DEFINE'	=> "-D$xaudio_version",
 	    'INC'	=> "-I$sdk_dir/include",
 	    'MYEXTLIB'	=> 'conv_msg.o',
-	    'depend'	=> { 'MP3Play.xs' => 'constants.h' },
+	    'depend'	=> { 'src/MP3Play.xs' => 'src/constants.h' },
 	    'dist'	=> {
 	    	'PREOP' => 'perl tools/genreadme > README'
 	    }
 	);
 }
 
-sub WriteRunsample {
+sub write_runsample {
 	my $perlpath = $Config{perlpath};
 	open (OUT, "> runsample");
 	print OUT <<__EOF;
@@ -46,9 +57,41 @@ __EOF
 	chmod 0755, "runsample";
 }
 
+sub configure_xaudio_version {
+	my ($major, $minor, $revision) = @_;
+	
+	my $version_dir = "./version/$major.$minor";
+	
+	print "Copying $version_dir/constants.h to ./constants.h ...\n";
+	copy ("$version_dir/constants.h", ".")
+		or die "can't copy $version_dir/constants.h: $!";
+
+	print "Copying $version_dir/conv_msg.c to ./conv_msg.c ...\n";
+	copy ("$version_dir/conv_msg.c", ".")
+		or die "can't copy $version_dir/conv_msg.c: $!";
+	
+	open (FH, "> lib/MPEG/MP3Play/XA_Version.pm")
+		or die "can't write lib/MPEG/MP3Play/XA_Version.pm";
+	print FH <<__EOF;
+package MPEG::MP3Play::XA_Version;
+\$VERSION = "$major.$minor.$revision";
+\@VERSION = ($major,$minor,$revision);
+1;
+__EOF
+	close FH;
+
+	1;
+}
+
 sub get_sdk_directory {
+	my @ARGV = @_;
+	
+	my $sdk_dir = shift @ARGV;
+	$sdk_dir =~ s!/$!!;
+	return $sdk_dir if $sdk_dir;
+
 	my $ok;
-	my $sdk_dir = $SDK_DIR;
+	$sdk_dir = $SDK_DIR;
 
 	do {
 		print "Xaudio SDK directory [$sdk_dir] : ";
@@ -63,6 +106,32 @@ sub get_sdk_directory {
 	} while ( not $ok );
 
 	return $sdk_dir;
+}
+
+sub get_sdk_version {
+	my ($sdk_dir) = @_;
+	
+	my ($major, $minor, $revision);
+	open (FH, "$sdk_dir/include/xaudio.h")
+		or die "can't read $sdk_dir/include/xaudio.h";
+	while (<FH>) {
+		next if not /#define XA_IMPLEMENTATION_([^\s]+)/;
+		my $what = $1;
+		/(\d+)/;
+		$major    = $1 if $what eq 'MAJOR';
+		$minor    = $1 if $what eq 'MINOR';
+		$revision = $1 if $what eq 'REVISION';
+	}
+	
+	close (FH);
+	
+	$major    ||= '0';
+	$minor    ||= '0';
+	$revision ||= '0';
+
+	print "Detected Xaudio SDK Implementation: $major.$minor.$revision\n";
+
+	return ($major, $minor, $revision);
 }
 
 sub get_add_libs {

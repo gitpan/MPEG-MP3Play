@@ -25,6 +25,7 @@ main: {
 	# program exit
 
 	my $mp3 = new MyMP3Play;
+	$mp3->print_xaudio_implementation;
 	
 	# create simple window with progress bar
 

@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.20 2000/09/29 16:42:03 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.21 2001/01/05 22:05:30 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -37,19 +37,6 @@ const char *
 xaudio_error_string(code)
 	int	code
 
-unsigned int
-xaudio_get_api_version(api_id)
-	unsigned int	api_id
-
-int
-control_procedure_new(control, control_driver_args, procedure, procedure_args, forwarder, forwarder_args)
-	void **	control
-	void *	control_driver_args
-	XA_ControlProcedure	procedure
-	void *	procedure_args
-	XA_EventForwarderProcedure	forwarder
-	void *	forwarder_args
-
 int
 control_procedure_delete(control)
 	void *	control
@@ -67,11 +54,6 @@ control_message_from_bytes(message, buffer)
 
 int
 control_message_send(control, code, ...)
-	void *	control
-	int	code
-
-int
-control_event_send(control, code, ...)
 	void *	control
 	int	code
 
@@ -144,36 +126,19 @@ control_message_send_IPI(control, code, int1, ptr1, int2)
 	const void *	ptr1
 	int	int2
 
-int
-control_message_post_to_command_queue(control, message)
-	void *	control
-	const XA_Message *	message
-
-int
-control_message_post_to_event_queue(control, message)
-	void *	control
-	const XA_Message *	message
-
-#void
-#control_message_sprint(string, message)
-#	char *	string
-#	const XA_Message *	message
-#
-#void
-#control_message_print(message)
-#	XA_Message *	message
-
-
-#---- end of h2xs generated stuff
-
 #---------------------------------------------------------------------
 # Player Constructor
 #---------------------------------------------------------------------
 
 void *
 new_player()
-CODE:
-	void * player;
+	CODE:
+#ifdef mp3play_xaudio_version_2_2
+	XA_Control *player;
+#endif
+#ifdef mp3play_xaudio_version_0_0
+	void *player;
+#endif
 	if ( XA_SUCCESS != player_new (&player, NULL) ) {
 	  player = NULL;
 	}
@@ -188,8 +153,9 @@ RETVAL
 
 void
 destroy_player(player)
-	void* player
-CODE:
+	void *player;
+
+	CODE:
 	if ( player != NULL) {
 		player_delete (player);
 	}
@@ -242,37 +208,18 @@ command_read_pipe (control)
 	void * control
 	
 	CODE:
+#ifdef mp3play_xaudio_version_2_2
+	RETVAL = ((XA_Control*)control)->command_read_pipe;
+#endif
+#ifdef mp3play_xaudio_version_0_0
 	RETVAL = ((XA_PipeControl*)control)->command_read_pipe;
+#endif
 	
 	OUTPUT:
 	RETVAL
 
+
 #---- set_equalizer_codec
-
-#int
-#set_equalizer_codec (control, left, right)
-#	void * control
-#	signed char * left
-#	signed char * right
-#
-#	CODE:
-#	XA_EqualizerInfo equalizer;
-#	int	i;
-#
-#	for (i=0; i < 32; ++i) {
-#		equalizer.left[i] = left[i];
-#		equalizer.right[i] = right[i];
-#	}
-#	
-#	RETVAL = control_message_send (
-#		control,
-#		XA_MSG_SET_CODEC_EQUALIZER,
-#		&equalizer
-#	);
-#	
-#	OUTPUT:
-#	RETVAL
-
 
 int
 set_equalizer_codec (control, left, right)

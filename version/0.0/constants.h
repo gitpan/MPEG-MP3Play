@@ -32,18 +32,6 @@ constant(char *name, int arg)
 #else
 			goto not_there;
 #endif
-		if (strEQ(name, "XA_ERROR_BASE_CODEC"))
-#ifdef XA_ERROR_BASE_CODEC
-			return XA_ERROR_BASE_CODEC;
-#else
-			goto not_there;
-#endif
-		if (strEQ(name, "XA_ERROR_NO_CODEC"))
-#ifdef XA_ERROR_NO_CODEC
-			return XA_ERROR_NO_CODEC;
-#else
-			goto not_there;
-#endif
 
 		break;
 
@@ -460,12 +448,6 @@ constant(char *name, int arg)
 	case 'H':
 		if (strEQ(name, "XA_MSG_COMMAND_FEEDBACK_FLUSH"))
 			return XA_MSG_COMMAND_FEEDBACK_FLUSH;
-		if (strEQ(name, "XA_CONTROL_PRIORITY_HIGH"))
-#ifdef XA_CONTROL_PRIORITY_HIGH
-			return XA_CONTROL_PRIORITY_HIGH;
-#else
-			goto not_there;
-#endif
 		if (strEQ(name, "XA_ERROR_ENVIRONMENT_TYPE_MISMATCH"))
 #ifdef XA_ERROR_ENVIRONMENT_TYPE_MISMATCH
 			return XA_ERROR_ENVIRONMENT_TYPE_MISMATCH;
@@ -526,12 +508,6 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_OUTPUT_MASTER_LEVEL;
 		if (strEQ(name, "XA_MSG_NOTIFY_DEBUG_LEVEL"))
 			return XA_MSG_NOTIFY_DEBUG_LEVEL;
-		if (strEQ(name, "XA_CONTROL_PRIORITY_NORMAL"))
-#ifdef XA_CONTROL_PRIORITY_NORMAL
-			return XA_CONTROL_PRIORITY_NORMAL;
-#else
-			goto not_there;
-#endif
 		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL"))
 #ifdef XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL
 			return XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL;
@@ -682,8 +658,6 @@ constant(char *name, int arg)
 			return XA_MSG_COMMAND_OUTPUT_REMOVE_FILTER;
 		if (strEQ(name, "XA_MSG_COMMAND_OUTPUT_MODULE_REGISTER"))
 			return XA_MSG_COMMAND_OUTPUT_MODULE_REGISTER;
-		if (strEQ(name, "XA_MSG_COMMAND_CODEC_MODULE_REGISTER"))
-			return XA_MSG_COMMAND_CODEC_MODULE_REGISTER;
 		if (strEQ(name, "XA_MSG_SET_PLAYER_ENVIRONMENT_INTEGER"))
 			return XA_MSG_SET_PLAYER_ENVIRONMENT_INTEGER;
 		if (strEQ(name, "XA_MSG_GET_PLAYER_ENVIRONMENT_INTEGER"))
@@ -802,18 +776,6 @@ constant(char *name, int arg)
 			return XA_OUTPUT_CHANNELS_MONO_LEFT;
 		if (strEQ(name, "XA_OUTPUT_CHANNELS_MONO_RIGHT"))
 			return XA_OUTPUT_CHANNELS_MONO_RIGHT;
-		if (strEQ(name, "XA_CONTROL_PRIORITY_LOWEST"))
-#ifdef XA_CONTROL_PRIORITY_LOWEST
-			return XA_CONTROL_PRIORITY_LOWEST;
-#else
-			goto not_there;
-#endif
-		if (strEQ(name, "XA_CONTROL_PRIORITY_HIGHEST"))
-#ifdef XA_CONTROL_PRIORITY_HIGHEST
-			return XA_CONTROL_PRIORITY_HIGHEST;
-#else
-			goto not_there;
-#endif
 		if (strEQ(name, "XA_NOTIFY_MASK_FEEDBACK_EVENT"))
 #ifdef XA_NOTIFY_MASK_FEEDBACK_EVENT
 			return XA_NOTIFY_MASK_FEEDBACK_EVENT;
@@ -868,12 +830,6 @@ constant(char *name, int arg)
 #else
 			goto not_there;
 #endif
-		if (strEQ(name, "XA_ERROR_UNSUPPORTED_FORMAT"))
-#ifdef XA_ERROR_UNSUPPORTED_FORMAT
-			return XA_ERROR_UNSUPPORTED_FORMAT;
-#else
-			goto not_there;
-#endif
 		if (strEQ(name, "XA_ERROR_BASE_ENVIRONMENT"))
 #ifdef XA_ERROR_BASE_ENVIRONMENT
 			return XA_ERROR_BASE_ENVIRONMENT;
@@ -883,16 +839,6 @@ constant(char *name, int arg)
 		if (strEQ(name, "XA_ERROR_NO_SUCH_ENVIRONMENT"))
 #ifdef XA_ERROR_NO_SUCH_ENVIRONMENT
 			return XA_ERROR_NO_SUCH_ENVIRONMENT;
-#else
-			goto not_there;
-#endif
-
-		break;
-
-	case 'W':
-		if (strEQ(name, "XA_CONTROL_PRIORITY_LOW"))
-#ifdef XA_CONTROL_PRIORITY_LOW
-			return XA_CONTROL_PRIORITY_LOW;
 #else
 			goto not_there;
 #endif
@@ -922,16 +868,10 @@ constant(char *name, int arg)
 			return XA_MSG_SET_INPUT_TIMECODE_GRANULARITY;
 		if (strEQ(name, "XA_MSG_GET_INPUT_TIMECODE_GRANULARITY"))
 			return XA_MSG_GET_INPUT_TIMECODE_GRANULARITY;
-		if (strEQ(name, "XA_MSG_SET_CODEC_QUALITY"))
-			return XA_MSG_SET_CODEC_QUALITY;
-		if (strEQ(name, "XA_MSG_GET_CODEC_QUALITY"))
-			return XA_MSG_GET_CODEC_QUALITY;
 		if (strEQ(name, "XA_MSG_NOTIFY_READY"))
 			return XA_MSG_NOTIFY_READY;
 		if (strEQ(name, "XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY"))
 			return XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY;
-		if (strEQ(name, "XA_MSG_NOTIFY_CODEC_QUALITY"))
-			return XA_MSG_NOTIFY_CODEC_QUALITY;
 		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY"))
 #ifdef XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY
 			return XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY;

@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.45 2001/01/05 13:23:43 joern Exp $
+# $Id: MP3Play.pm,v 1.46 2001/01/05 22:05:29 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -68,8 +68,6 @@ $VERSION = '0.13';
 	XA_MSG_GET_OUTPUT_CHANNELS
 	XA_MSG_SET_OUTPUT_PORTS
 	XA_MSG_GET_OUTPUT_PORTS
-	XA_MSG_SET_OUTPUT_FEEDBACK_RATE
-	XA_MSG_GET_OUTPUT_FEEDBACK_RATE
 	XA_MSG_SET_CODEC_EQUALIZER
 	XA_MSG_GET_CODEC_EQUALIZER
 	XA_MSG_SET_NOTIFICATION_MASK
@@ -92,8 +90,6 @@ $VERSION = '0.13';
 	XA_MSG_NOTIFY_INPUT_POSITION_RANGE
 	XA_MSG_NOTIFY_INPUT_TIMECODE
 	XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY
-	XA_MSG_NOTIFY_INPUT_DURATION
-	XA_MSG_NOTIFY_INPUT_STREAM_INFO
 	XA_MSG_NOTIFY_INPUT_MODULE
 	XA_MSG_NOTIFY_INPUT_MODULE_INFO
 	XA_MSG_NOTIFY_INPUT_DEVICE_INFO
@@ -107,7 +103,6 @@ $VERSION = '0.13';
 	XA_MSG_NOTIFY_OUTPUT_MASTER_LEVEL
 	XA_MSG_NOTIFY_OUTPUT_CHANNELS
 	XA_MSG_NOTIFY_OUTPUT_PORTS
-	XA_MSG_NOTIFY_OUTPUT_FEEDBACK_RATE
 	XA_MSG_NOTIFY_OUTPUT_MODULE
 	XA_MSG_NOTIFY_OUTPUT_MODULE_INFO
 	XA_MSG_NOTIFY_OUTPUT_DEVICE_INFO
@@ -118,13 +113,6 @@ $VERSION = '0.13';
 	XA_MSG_NOTIFY_PROGRESS
 	XA_MSG_NOTIFY_DEBUG
 	XA_MSG_NOTIFY_ERROR
-	XA_MSG_COMMAND_QUEUE_FEEDBACK_EVENT
-	XA_MSG_COMMAND_QUEUE_TAG_EVENT
-	XA_MSG_COMMAND_FEEDBACK_PAUSE
-	XA_MSG_COMMAND_FEEDBACK_RESTART
-	XA_MSG_COMMAND_FEEDBACK_FLUSH
-	XA_MSG_NOTIFY_FEEDBACK_EVENT
-	XA_MSG_NOTIFY_TAG_EVENT
 	XA_MSG_LAST
 	XA_PLAYER_STATE_STOPPED
 	XA_PLAYER_STATE_PLAYING
@@ -235,7 +223,6 @@ $VERSION = '0.13';
 	XA_ERROR_ENVIRONMENT_TYPE_MISMATCH
 	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_STOP
 	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_PAUSE
-	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_EOF
 );
 
 %EXPORT_TAGS = (
@@ -285,8 +272,6 @@ msg => [qw (
 	XA_MSG_NOTIFY_INPUT_POSITION_RANGE
 	XA_MSG_NOTIFY_INPUT_TIMECODE
 	XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY
-	XA_MSG_NOTIFY_INPUT_DURATION
-	XA_MSG_NOTIFY_INPUT_STREAM_INFO
 	XA_MSG_NOTIFY_INPUT_MODULE
 	XA_MSG_NOTIFY_INPUT_MODULE_INFO
 	XA_MSG_NOTIFY_INPUT_DEVICE_INFO
@@ -300,7 +285,6 @@ msg => [qw (
 	XA_MSG_NOTIFY_OUTPUT_MASTER_LEVEL
 	XA_MSG_NOTIFY_OUTPUT_CHANNELS
 	XA_MSG_NOTIFY_OUTPUT_PORTS
-	XA_MSG_NOTIFY_OUTPUT_FEEDBACK_RATE
 	XA_MSG_NOTIFY_OUTPUT_MODULE
 	XA_MSG_NOTIFY_OUTPUT_MODULE_INFO
 	XA_MSG_NOTIFY_OUTPUT_DEVICE_INFO
@@ -336,21 +320,12 @@ msg => [qw (
 	XA_MSG_GET_OUTPUT_CHANNELS
 	XA_MSG_SET_OUTPUT_PORTS
 	XA_MSG_GET_OUTPUT_PORTS
-	XA_MSG_SET_OUTPUT_FEEDBACK_RATE
-	XA_MSG_GET_OUTPUT_FEEDBACK_RATE
 	XA_MSG_SET_CODEC_EQUALIZER
 	XA_MSG_GET_CODEC_EQUALIZER
 	XA_MSG_SET_NOTIFICATION_MASK
 	XA_MSG_GET_NOTIFICATION_MASK
 	XA_MSG_SET_DEBUG_LEVEL
 	XA_MSG_GET_DEBUG_LEVEL
-	XA_MSG_COMMAND_QUEUE_FEEDBACK_EVENT
-	XA_MSG_COMMAND_QUEUE_TAG_EVENT
-	XA_MSG_COMMAND_FEEDBACK_PAUSE
-	XA_MSG_COMMAND_FEEDBACK_RESTART
-	XA_MSG_COMMAND_FEEDBACK_FLUSH
-	XA_MSG_NOTIFY_FEEDBACK_EVENT
-	XA_MSG_NOTIFY_TAG_EVENT
 	XA_MSG_LAST
 	XA_TIMEOUT_INFINITE
 	XA_OUTPUT_VOLUME_IGNORE_FIELD
@@ -366,7 +341,6 @@ state => [qw (
 	XA_OUTPUT_STATE_CLOSED
 	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_STOP
 	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_PAUSE
-	XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_EOF
 )],
 mask => [qw (
 	XA_NOTIFY_MASK_ERROR
@@ -532,6 +506,24 @@ sub debug {
 
 	$self->{'debug'} = $debug;
 
+	1;
+}
+
+sub get_xaudio_implementation {
+	my $self = shift;
+	
+	require MPEG::MP3Play::XA_Version;
+	
+	return @MPEG::MP3Play::XA_Version::VERSION if wantarray;
+	return $MPEG::MP3Play::XA_Version::VERSION;
+}
+
+sub print_xaudio_implementation {
+	my $self = shift;
+	
+	my $version = $self->get_xaudio_implementation;
+	print "Xaudio Implementation: $version\n";
+	
 	1;
 }
 
@@ -826,6 +818,10 @@ sub _process_message {
 	my ($msg) = @_;
 	my $method = $msg->{_method_name};
 
+	print STDERR "unkown message recieved\n"
+		if $self->{debug} and not defined $method;
+	return 1 if not defined $method;
+
 	my $retval = eval { $self->$method ($msg) };
 	croak $@ if $@ and $@ !~ /^MP3Play autoload error/;
 	$retval = 1 if $@;
@@ -849,8 +845,9 @@ sub _process_message {
 		# ok, first build %MESSAGE_NAME
 		my $eval;
 		foreach my $msg (@{$EXPORT_TAGS{msg}}) {
-			$eval .= qq{\$MESSAGE_NAME{&$msg} = '$msg';\n};
+			$eval .= qq{\$MESSAGE_NAME{&$msg} = '$msg';};
 		}
+
 		eval $eval;
 		
 		$MESSAGE_NAME_BUILT = 1;
@@ -907,6 +904,8 @@ sub msg_notify_ack {
 	
 	my ($msg) = @_;
 	
+	use Data::Dumper;print Dumper($msg);
+	
 	my $msg_name = $self->_message_name ($msg->{ack});
 
 	carp "message '$msg_name' acknowledged";
@@ -951,29 +950,35 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
-This README and the documention cover version 0.12 of the
+This README and the documention cover version 0.14 of the
 MPEG::MP3Play module.
 
 =head1 PREREQUISITES
 
 B<Xaudio SDK>
 
-MPEG::MP3Play is build against the 3.0.8 version of the Xaudio SDK
-and uses the async interface of the Xaudio library.
+MPEG::MP3Play is build against the 3.0.8 and 3.2.1 versions of
+the Xaudio SDK and uses the async interface of the Xaudio library.
 
-I don't know if older versions will work properly. The SDK is not
-part of this distribution, so get and install it first
+The SDK is not part of this distribution, so get and install it first
 (http://www.xaudio.com/).
 
-B<ATTENTION: Xaudio Versions 3.2.x DO ACTUALLY NOT WORK>
+B<ATTENTION: Xaudio Version 3.2.x SUPPORT IS ACTUALLY BETA>
 
-Unfortunately Xaudio changed some internals of the API. These
-changes are actually bad documented, so it's hard for me to
-adjust MPEG::MP3Play. Please use 3.0.8 meanwhile.
+Unfortunately Xaudio changed many internals of the API since
+version 3.0.0, and many of them are not documented. So I had to
+hack around, but everything seem to work now. Even so I think 3.2.x
+support is actually beta. If you have problems with this
+version, please send me an email (see bug report section below)
+and downgrade to 3.0.x if you can't get sleep ;)
+
+If you have still problems, also with 3.0.8, please use MPEG::MP3Play
+version 0.13. This version is absolutely stable in conjunction with
+Xaudio 3.0.8.
 
 For Linux Users:
 
-Xaudio removed the 3.0.8 Linux version from their developers page.
+Xaudio removed the 3.0.8 Linux version from their developer page.
 Please read and agree to the license restrictions under
 http://www.xaudio.com/developers/license.php and download the
 package from here:
@@ -1130,6 +1135,19 @@ $mp3->debug (
 With this method you can set the debugging level at any time.
 If you pass an empty string or 'none' debugging will be disabled.
 
+=item B<get_xaudio_implementation>
+
+$xaudio_imp = $mp3->get_xaudio_implementation
+@xaudio_imp = $mp3->get_xaudio_implementation
+
+Returns the internal major/minor/revision numbers of your Xaudio
+SDK implementation. Returns 0.0.0 if not supported by your Xaudio
+version.
+
+=item B<print_xaudio_implementation>
+
+Prints the implementation number to STDOUT.
+
 =back
 
 =head1 CONTROL METHODS
@@ -1260,7 +1278,6 @@ supported constants are:
 
   XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_STOP
   XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_PAUSE
-  XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_EOF
 
 Refer to the Xaudio documentation for details about this flags.
 
@@ -1693,7 +1710,7 @@ Joern Reder <joern@zyn.de>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1999-2000 by Joern Reder, All Rights Reserved.
+Copyright (C) 1999-2001 by Joern Reder, All Rights Reserved.
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -1703,6 +1720,6 @@ LICENSE text published on http://www.xaudio.com/.
 
 =head1 SEE ALSO
 
-perl(1), MPEG::MP3Info.
+perl(1).
 
 =cut

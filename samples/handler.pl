@@ -29,6 +29,8 @@ main: {
 		debug => 'all'
 	);
 	
+	$mp3->print_xaudio_implementation;
+
 	# setting user data: our volume state
 	$mp3->set_user_data ({
 		volume => 50,
@@ -53,13 +55,6 @@ main: {
 	$mp3->set_notification_mask (
 		&XA_NOTIFY_MASK_INPUT_TIMECODE,
 		&XA_NOTIFY_MASK_PLAYER_STATE
-	);
-
-	# this is optional (and for testing):
-	# => output should be closed on eof
-
-	$mp3->set_player_mode (
-		&XA_PLAYER_MODE_OUTPUT_AUTO_CLOSE_ON_EOF
 	);
 
 	# the message handler with 50000 usec timeout,

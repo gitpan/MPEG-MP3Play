@@ -1,8 +1,15 @@
-$Id: Changes,v 1.25 2001/01/05 13:23:42 joern Exp $
+$Id: Changes,v 1.26 2001/01/05 22:05:26 joern Exp $
 
 Revision history for Perl extension MPEG::MP3Play.
 
-0.13  Fri Jan 01 2001, joern
+0.14. Fri Jan 05 2001, joern
+	- puh, many changes of internal data structures in the 3.2.x
+	  release of Xaudio. Some messages constants were gone, but
+	  I didn't use them anywhere, so this should be no problem.
+	  This version builds well with Xaudio 3.0.8 and 3.2.1 under
+	  my Linux system.
+
+0.13  Fri Jan 05 2001, joern
 	- added hint about incompatibility to actual Xaudio
 	  releases 3.2.x. Hopefully the Xaudio guys document their
 	  internal changes soon, so I can adjust MPEG::MP3Play...
