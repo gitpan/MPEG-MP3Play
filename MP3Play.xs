@@ -2,8 +2,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include </usr/local/xaudiosdk/include/player.h>
-#include </usr/local/xaudiosdk/include/control.h>
+#include "player.h"
+#include "control.h"
 
 static int
 not_here(char *s)
@@ -68,6 +68,14 @@ constant(char *name, int arg)
 	    return XA_MSG_COMMAND_INPUT_OPEN;
 	if (strEQ(name, "XA_MSG_COMMAND_PLAY"))
 	    return XA_MSG_COMMAND_PLAY;
+	if (strEQ(name, "XA_MSG_NOTIFY_INPUT_TIMECODE"))
+	    return XA_MSG_NOTIFY_INPUT_TIMECODE;
+	if (strEQ(name, "XA_MSG_NOTIFY_PLAYER_STATE"))
+	    return XA_MSG_NOTIFY_PLAYER_STATE;
+	if (strEQ(name, "XA_PLAYER_STATE_STOPPED"))
+	    return XA_PLAYER_STATE_STOPPED;
+	if (strEQ(name, "XA_PLAYER_STATE_EOF"))
+	    return XA_PLAYER_STATE_EOF;
 
 	if (strEQ(name, "XA_CMSEND"))
 #ifdef XA_CMSEND
@@ -790,22 +798,21 @@ control_message_get(control, message)
 	void *	control
 	XA_Message *	message
 
-int
-control_message_wait(control, message, timeout)
-	void *	control
-	XA_Message *	message
-	int	timeout
-
-void
-control_message_print(message)
-	const XA_Message *	message
-
 void
 control_message_sprint(string, message)
 	char *	string
 	const XA_Message *	message
 
-# end of h2xs generated stuff
+void
+control_message_print(message)
+	XA_Message *	message
+
+
+#---- end of h2xs generated stuff
+
+#---------------------------------------------------------------------
+# Player Constructor
+#---------------------------------------------------------------------
 
 void *
 new_player()
@@ -822,6 +829,10 @@ CODE:
 OUTPUT:
 RETVAL
 
+#---------------------------------------------------------------------
+# Player Desctructor
+#---------------------------------------------------------------------
+
 void
 destroy_player(player)
 	void* player
@@ -830,3 +841,38 @@ CODE:
 		player_delete (player);
 #		printf ("player destroyed\n");
 	}
+
+#---------------------------------------------------------------------
+# Message Handling
+#---------------------------------------------------------------------
+
+#---- control_message_wait
+
+SV*
+control_message_wait (control, timeout)
+	void *	control
+	int	timeout
+
+	CODE:
+	XA_Message	msg;
+	int		status;
+
+	status = control_message_wait (control, &msg, timeout);
+
+	if ( ! status ) 
+		RETVAL = newRV_noinc((SV*)convert_message_to_HV (&msg));
+	
+	OUTPUT:
+	RETVAL
+
+#---- XA_Message* destructor
+
+#MODULE = MPEG::MP3Play	PACKAGE = XA_MessagePtr	  PREFIX = xa_message_
+
+#void
+#xa_message_DESTROY(msg)
+#	XA_Message*	msg
+#	CODE:
+#	printf ("destroy message\n");
+#	free (msg);
+

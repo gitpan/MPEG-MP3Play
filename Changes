@@ -1,5 +1,15 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.02  Tue Aug 03 14:36:58 1999
+	- added gen_conv_msg.pl to generate conv_msg.c out
+	  of the HTML documention provided by X-Audio
+	- conv_msg.c converts XA messages to HVs, for simple
+	  handling in Perl
+	- test.pl enhanced. Now shows timecode and exits on
+	  key pressure (if Term::ReadKey is installed) and
+	  on end of file.
+	- fixed minor POD formatting error in MP3Play.pm
+
 0.01  Sun Jul 25 20:56:18 1999
 	- original version; created by h2xs 1.19
 	- my first contact with XS, but playing mp3 files works

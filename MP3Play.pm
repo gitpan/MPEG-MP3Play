@@ -1,15 +1,27 @@
+# $Id: MP3Play.pm,v 1.9 1999/08/03 14:52:30 joern Exp $
+
 package MPEG::MP3Play;
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA $AUTOLOAD);
+use vars qw($VERSION @EXPORT @ISA $AUTOLOAD);
 
+require Exporter;
 require DynaLoader;
 require AutoLoader;
 
-@ISA = qw(DynaLoader);
+@ISA = qw(Exporter DynaLoader);
 
-$VERSION = '0.01';
+@EXPORT = qw(
+	XA_MSG_COMMAND_INPUT_OPEN
+	XA_MSG_COMMAND_PLAY
+	XA_MSG_NOTIFY_INPUT_TIMECODE
+	XA_MSG_NOTIFY_PLAYER_STATE
+	XA_PLAYER_STATE_STOPPED
+	XA_PLAYER_STATE_EOF
+);
+
+$VERSION = '0.02';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -63,30 +75,53 @@ sub play {
 
 	my ($filename) = @_;
 	
-	my $msg;
-	
 	control_message_send_S (
 		$player,
-		XA_MSG_COMMAND_INPUT_OPEN(),
+		&XA_MSG_COMMAND_INPUT_OPEN,
 		$filename
 	);
 	
-#	control_message_wait (
-#		$player,
-#		$msg,
-#		100
-#	);
-	
+	control_message_send_N (
+		$player,
+		&XA_MSG_COMMAND_PLAY
+	);
+
+	return;
+
+	# this stuff is currently disabled...
+
+	do {
+		print "waiting for message...\n";
+		my $msg = control_message_wait (
+			$player,
+			&XA_TIMEOUT_INFINITE
+		);
+#		print "msg=$msg\n";
+		use Data::Dumper;
+		print Dumper ($msg);
+		
+#		control_message_print ($msg);
+	} while ( 1 );
+
 #	die "can't open mp3 file '$filename'"
 #		if $status != XA_SUCCESS();
 	
-	control_message_send_N (
-		$player,
-		XA_MSG_COMMAND_PLAY()
-	);
 #	die "can't open mp3 file '$filename'"
 #		if $status != XA_SUCCESS();
 }
+
+
+sub get_message_wait {
+	my $self = shift;
+
+	my $msg = control_message_wait (
+		$self->{player},
+		&XA_TIMEOUT_INFINITE
+	);
+
+	return $msg;	
+}
+
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
@@ -102,7 +137,14 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
   use MPEG::MP3Play;
   my $mp3 = new MPEG::MP3Play;
-  $mp3->play ("music.mp3");
+  
+  $mp3->play ("test.mp3");
+
+  while ( 1 ) {
+  	my $msg = $mp3->get_message_wait;
+	last if ( $msg->{code}  == &XA_MSG_NOTIFY_PLAYER_STATE and
+	          $msg->{state} == &XA_PLAYER_STATE_EOF )
+  }
 
 =head1 DESCRIPTION
 
@@ -110,37 +152,44 @@ This Perl module enables you to playback MPEG music.
 
 =head1 PREREQUISITES
 
-MPEG::MP3Play is build against the 3.0 version of the Xaudio SDK.
+MPEG::MP3Play is build against the 3.0 version of the Xaudio SDK
+and uses the async interface of the Xaudio library.
+
 I don't know if older versions will work properly. The SDK is not
 part of this distribution, so get and install it first
 (http://www.xaudio.com/).
 
+test.pl uses Term::ReadKey if it's installed.
+
 =head1 INSTALLATION
 
-perl Makefile.PL
+First, generate the Makefile:
+
+  perl Makefile.PL
 
 You will be prompted for the location of the Xaudio SDK. The directory
 must contain the include and lib subdirectories, where the Xaudio header
 and library files are installed.
 
-make
+  make
 
 Now copy a mp3 file called 'test.mp3' into the actual directory.
-It will be played, if everything build properly.
+It will be played, if everything built properly.
 
-make test
+  make test
 
 Ok, now install it and enjoy!
 
-make install
+  make install
 
-=METHODS
+=head1 METHODS
 
-To be documented.
+Actually not documented yet, because of frequently changes.
+This will be changed very soon. Use the source, instead ;)
 
-=TODO
+=head1 TODO
 
-Oh wow, there's much to do. This is the 0.01 release of the
+Oh wow, there's much to do. This is the 0.02 release of the
 module, and it has actually a really poor interface ;) Also
 this is my first XS module, so I want to learn much about
 C/Perl glues in the near future.
@@ -150,7 +199,7 @@ this module can be used by Perl MPEG players as a backend.
 I'm a GTK fan, so it's possible, that I write a Perl/GTK based
 MPEG player.
 
-Ideas, code and any help are very apreciated.
+Ideas, code and any help are very appreciated.
 
 =head1 AUTHOR
 
@@ -163,7 +212,7 @@ Copyright (C) 1999 by Joern Reder, All Rights Reserved
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
 
-The Xaudio SDK is Copyright by MpegTV,LLC. Please refer to the
+The Xaudio SDK is copyright by MpegTV,LLC. Please refer to the
 LICENSE text published on http://www.xaudio.com/.
 
 =head1 SEE ALSO

@@ -2,6 +2,8 @@ Changes
 MANIFEST
 MP3Play.pm
 MP3Play.xs
+gen_conv_msg
+conv_msg.c
 Makefile.PL
 test.pl
 typemap

@@ -19,15 +19,63 @@ print "ok 1\n";
 # of the test code):
 
 use strict;
+
+my $has_readkey;
+BEGIN {
+	eval qq{
+		use Term::ReadKey;
+		\$has_readkey = 1;
+		print "Fine - Term::ReadKey loaded OK!\n";
+	}
+}
+
+print "Term::ReadKey missing! ReadKey features disabled!\n" unless $has_readkey;
+
 my $mp3 = new MPEG::MP3Play;
 
 my $filename = "test.mp3";
 
 if ( -f $filename ) {
-	print "playing 10 seconds of $filename...\n";
-	$mp3->play ($filename);
-	sleep 10;
+	if ( $has_readkey ) {
+		print "playing $filename (press any key to stop)...\n";
+	} else {
+		print "playing $filename (press Ctrl+C to stop)...\n";
+	}
+	$mp3->play ("$filename");
+	print_status ($mp3);
 } else {
 	print "Please copy a mp3 file called 'test.mp3' to this directory.\n";
-	print "It will then be played if you do 'make test' again.\n";
+	print "It will be played if you run 'make test' again.\n";
+}
+
+
+sub print_status {
+	my ($mp3) = @_;
+
+	$has_readkey and ReadMode(4);
+	
+	my $finish = 0;
+	do {
+		my $msg = $mp3->get_message_wait;
+		my $code = $msg->{code};
+		
+		if ( $code == &XA_MSG_NOTIFY_INPUT_TIMECODE ) {
+			print "\r";
+			printf "TIMECODE: %02d:%02d:%02d",
+				$msg->{timecode_h},
+				$msg->{timecode_m},
+				$msg->{timecode_s}
+		} elsif ( $code == &XA_MSG_NOTIFY_PLAYER_STATE ) {
+			$finish = 1 if $msg->{state} == &XA_PLAYER_STATE_EOF;
+		}
+		
+		if ( $has_readkey ) {
+			my $key = ReadKey(-1);
+			$finish = 1 if defined $key;
+		}
+	} while ( not $finish );
+
+	$has_readkey and ReadMode(0);
+
+	print "\n\n";
 }
