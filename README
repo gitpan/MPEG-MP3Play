@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
       use MPEG::MP3Play;
       my $mp3 = new MPEG::MP3Play;
-      
+  
       $mp3->open ("test.mp3");
       $mp3->play;
       $mp3->message_handler;
@@ -12,48 +12,42 @@ SYNOPSIS
 DESCRIPTION
     This Perl module enables you to playback MPEG music.
 
-    This README and the documention cover version 0.14 of the
-    MPEG::MP3Play module.
+    This README and the documention cover version 0.15 of the MPEG::MP3Play
+    module.
 
 PREREQUISITES
     Xaudio SDK
 
-    MPEG::MP3Play is build against the 3.0.8 and 3.2.1 versions of
-    the Xaudio SDK and uses the async interface of the Xaudio
-    library.
+    MPEG::MP3Play is build against the 3.0.8 and 3.2.1 versions of the
+    Xaudio SDK and uses the async interface of the Xaudio library.
 
-    The SDK is not part of this distribution, so get and install it
-    first (http://www.xaudio.com/).
+    The SDK is not part of this distribution, so get and install it first
+    (http://www.xaudio.com/).
 
     ATTENTION: Xaudio Version 3.2.x SUPPORT IS ACTUALLY BETA
 
-    Unfortunately Xaudio changed many internals of the API since
-    version 3.0.0, and many of them are not documented. So I had to
-    hack around, but everything seem to work now. Even so I think
-    3.2.x support is actually beta. If you have problems with this
-    version, please send me an email (see bug report section below)
-    and downgrade to 3.0.x if you can't get sleep ;)
-
-    If you have still problems, also with 3.0.8, please use
-    MPEG::MP3Play version 0.13. This version is absolutely stable in
-    conjunction with Xaudio 3.0.8.
+    Unfortunately Xaudio changed many internals of the API since version
+    3.0.0, and many of them are not documented. So I had to hack around, but
+    everything seem to work now. Even so I think 3.2.x support is actually
+    beta. If you have problems with this version, please send me an email
+    (see bug report section below) and downgrade to 3.0.x if you can't get
+    sleep ;)
 
     For Linux Users:
 
-    Xaudio removed the 3.0.8 Linux version from their developer
-    page. Please read and agree to the license restrictions under
-    http://www.xaudio.com/developers/license.php and download the
-    package from here:
+    Xaudio removed the 3.0.8 Linux version from their developer page. Please
+    read and agree to the license restrictions under
+    http://www.xaudio.com/developers/license.php and download the package
+    from here:
 
       http://www.netcologne.de/~nc-joernre/-/xasdk-3.0.8.x86-unknown-linux-glibc.tar.gz
 
     Perl
 
-    I built and tested this module using Perl 5.005_03 and Perl
-    5.004_04. It should work also with Perl 5.004_05 and Perl 5.6,
-    but I did not test this. If someone builds MPEG::MP3Play
-    successfully with other versions of Perl, plesase drop me a
-    note.
+    I built and tested this module using Perl 5.6.1, Perl 5.005_03, Perl
+    5.004_04. It should work also with Perl 5.004_05 and Perl 5.6.0, but I
+    did not test this. If someone builds MPEG::MP3Play successfully with
+    other versions of Perl, please drop me a note.
 
     Optionally used Perl modules
 
@@ -62,14 +56,13 @@ PREREQUISITES
       samples/gtk*.pl require Gtk.
 
 DOWNLOADING
-    You can download MPEG::MP3Play from any CPAN mirror. You will
-    find it in the following directories:
+    You can download MPEG::MP3Play from any CPAN mirror. You will find it in
+    the following directories:
 
       http://www.perl.com/CPAN/modules/by-module/MPEG/
       http://www.perl.com/CPAN/modules/by-authors/id/J/JR/JRED/
 
-    You'll also find recent information and download links on my
-    homepage:
+    You'll also find recent information and download links on my homepage:
 
       http://www.netcologne.de/~nc-joernre/
 
@@ -78,9 +71,9 @@ INSTALLATION
 
       perl Makefile.PL
 
-    You will be prompted for the location of the Xaudio SDK. The
-    directory must contain the include and lib subdirectories, where
-    the Xaudio header and library files are installed.
+    You will be prompted for the location of the Xaudio SDK. The directory
+    must contain the include and lib subdirectories, where the Xaudio header
+    and library files are installed.
 
       make
       make test
@@ -94,63 +87,58 @@ INSTALLATION
       make install
 
 SAMPLE SCRIPTS
-    There are some small test scripts in the samples directory. You
-    can run these scripts before 'make install' with the runsample
-    script (or directly with 'perl', after running 'make install').
-    For runsample usage: see above.
+    There are some small test scripts in the samples directory. You can run
+    these scripts before 'make install' with the runsample script (or
+    directly with 'perl', after running 'make install'). For runsample
+    usage: see above.
 
-    All scripts expect a mp3 file 'test.mp3' in the actual
-    directory.
+    All scripts expect a mp3 file 'test.mp3' in the actual directory.
 
-    play.pl Textmodus playback. Displays the timecode. Simple volume
-            control with '+' and '-' keys.
+    play.pl Textmodus playback. Displays the timecode. Simple volume control
+            with '+' and '-' keys.
 
     handler.pl
-            Does nearly the same as play.pl, but uses the builtin
-            message handler. You'll see, that this solution is much
-            more elegant. It *requires* Term::ReadKey.
+            Does nearly the same as play.pl, but uses the builtin message
+            handler. You'll see, that this solution is much more elegant. It
+            *requires* Term::ReadKey.
 
-            This script makes use of the debugging facility, the
-            equalizer features and is best documented so far.
+            This script makes use of the debugging facility, the equalizer
+            features and is best documented so far.
 
-    gtk.pl  This script demonstrates the usage of MPEG::MP3Play with the
-            Gtk module. It produces a simple window with a progress
-            bar while playing back the test.mp3 file.
+    gtk.pl  This script demonstrates the usage of MPEG::MP3Play with the Gtk
+            module. It produces a simple window with a progress bar while
+            playing back the test.mp3 file.
 
     gtkhandler.pl
-            This script does the same as gtk.pl but uses the builtin
-            message handler concept instead of implementing message
-            handling by itself. Advantage of using the builtin
-            message handler: no global variables are necessary
-            anymore.
+            This script does the same as gtk.pl but uses the builtin message
+            handler concept instead of implementing message handling by
+            itself. Advantage of using the builtin message handler: no
+            global variables are necessary anymore.
 
-            Because 'runsample' uses '`perl -w'' you'll get a
-            warning message here complaining about a subroutine
-            redefinition. See the section USING THE BUILTIN MESSAGE
-            HANDLER for a discussion about this.
+            Because 'runsample' uses '`perl -w'' you'll get a warning
+            message here complaining about a subroutine redefinition. See
+            the section USING THE BUILTIN MESSAGE HANDLER for a discussion
+            about this.
 
     gtkinherit.pl
-            This is 'gtkhandler.pl' but throwing no warnings,
-            because it uses subclassing for implementing messages
-            handlers.
+            This is 'gtkhandler.pl' but throwing no warnings, because it
+            uses subclassing for implementing messages handlers.
 
     synopsis.pl
-            This one proves that the usage shown in the SYNOPSIS
-            *really* works ;)
+            Just proving it ;)
 
 BASIC CONCEPT
-    The concept of the Xaudio async API is based on forking an extra
-    process (or thread) for the MPEG decoding and playing. The
-    parent process controls this process by sending and recieving
-    messages. This message passing is asynchronous.
+    The concept of the Xaudio async API is based on forking an extra process
+    (or thread) for the MPEG decoding and playing. The parent process
+    controls this process by sending and recieving messages. This message
+    passing is asynchronous.
 
-    This module interface provides methods for sending common
-    messages to the MPEG process, eg. play, pause, stop. Also it
-    implements a message handler to process the messages sent back.
-    Eg. every message sent to the subprocess will be acknowledged by
-    sending back an XA_MSG_NOTIFY_ACK message (or XA_MSG_NOTIFY_NACK
-    on error). Error handling must be set up by handling this
-    messages.
+    This module interface provides methods for sending common messages to
+    the MPEG process, eg. play, pause, stop. Also it implements a message
+    handler to process the messages sent back. Eg. every message sent to the
+    subprocess will be acknowledged by sending back an XA_MSG_NOTIFY_ACK
+    message (or XA_MSG_NOTIFY_NACK on error). Error handling must be set up
+    by handling this messages.
 
     You will find detailed information about the interface of
     this module in its POD documentation.
@@ -172,13 +160,13 @@ BUGS
         Please tell me, if the treble control is OK for you, or not.
 
 PROBLEMS AND REPORTING BUGS
-    First check if you're using the most recent version of this
-    module, maybe the bug you're about to report is already fixed.
-    Also please read the documentation entirely.
+    First check if you're using the most recent version of this module,
+    maybe the bug you're about to report is already fixed. Also please read
+    the documentation entirely.
 
-    If you find a bug please send me a report. I will fix this as
-    soon as possible. You'll make my life easier if you provide the
-    following information along with your bugreport:
+    If you find a bug please send me a report. I will fix this as soon as
+    possible. You'll make my life easier if you provide the following
+    information along with your bugreport:
 
       - your OS and Perl version (please send me the output
         of 'perl -V')
@@ -189,26 +177,25 @@ PROBLEMS AND REPORTING BUGS
         I need the version number of your GTK+ library and
         the version number of your Perl Gtk module.
 
-    If you have a solution to fix the bug you're welcome to send me
-    a unified context diff of your changes, so I can apply them to
-    the trunk. You'll get a credit in the Changes file.
+    If you have a solution to fix the bug you're welcome to send me a
+    unified context diff of your changes, so I can apply them to the trunk.
+    You'll get a credit in the Changes file.
 
-    If you have problems with your soundsystem (you hear nothing, or
-    the sound is chopped up) please try to compile the sample
-    programs that are part of the Xaudio development kit. Do they
-    work properly? If not, this is most likely a problem of your
-    sound configuration and not a MPEG::MP3Play issue. Please check
-    the Xaudio documentation in this case, before contacting me.
-    Thanks.
+    If you have problems with your soundsystem (you hear nothing, or the
+    sound is chopped up) please try to compile the sample programs that are
+    part of the Xaudio development kit. Do they work properly? If not, this
+    is most likely a problem of your sound configuration and not a
+    MPEG::MP3Play issue. Please check the Xaudio documentation in this case,
+    before contacting me. Thanks.
 
 MPEG::MP3Play APPLICATIONS
-    I'm very interested to know, if someone write applications based
-    on MPEG::MP3Play. So don't hesitate to send me an email, if you
-    like (or not like ;) this module.
+    I'm very interested to know, if someone write applications based on
+    MPEG::MP3Play. So don't hesitate to send me an email, if you like (or
+    not like ;) this module.
 
 TESTED ENVIRONMENTS
-    This section lists the environments where users reported me that
-    this module functions well:
+    This section lists the environments where users reported me that this
+    module functions well:
 
       - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
         Linux 2.2.10, Xaudio SDK 3.01 glibc6,
@@ -225,19 +212,24 @@ AUTHOR
 COPYRIGHT
     Copyright (C) 1999-2001 by Joern Reder, All Rights Reserved.
 
-    This library is free software; you can redistribute it and/or
-    modify it under the same terms as Perl itself.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-    The Xaudio SDK is copyright by MpegTV,LLC. Please refer to the
-    LICENSE text published on http://www.xaudio.com/.
+    The Xaudio SDK is copyright by MpegTV,LLC. Please refer to the LICENSE
+    text published on http://www.xaudio.com/.
 
 SEE ALSO
     perl(1).
 
 CHANGES
-    $Id: Changes,v 1.26 2001/01/05 22:05:26 joern Exp $
+    $Id: Changes,v 1.28 2001/11/02 08:38:18 joern Exp $
 
     Revision history for Perl extension MPEG::MP3Play.
+
+    0.15  Fri Nov 02 2001, joern
+	- removed debugging code from equalizer
+	- added set_input_position_range submitted by
+	  Tom House <ixo@one11.net>. Thanks for that, Tom.
 
     0.14. Fri Jan 05 2001, joern
 	- puh, many changes of internal data structures in the 3.2.x

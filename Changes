@@ -1,6 +1,11 @@
-$Id: Changes,v 1.26 2001/01/05 22:05:26 joern Exp $
+$Id: Changes,v 1.28 2001/11/02 08:38:18 joern Exp $
 
 Revision history for Perl extension MPEG::MP3Play.
+
+0.15  Fri Nov 02 2001, joern
+	- removed debugging code from equalizer
+	- added set_input_position_range submitted by
+	  Tom House <ixo@one11.net>. Thanks for that, Tom.
 
 0.14. Fri Jan 05 2001, joern
 	- puh, many changes of internal data structures in the 3.2.x

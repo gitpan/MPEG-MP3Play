@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.21 2001/01/05 22:05:30 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.22 2001/01/05 23:03:10 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -232,11 +232,9 @@ set_equalizer_codec (control, left, right)
 	int	i;
 
 	for (i=0; i < 32; ++i) {
-		printf ("%d ", (signed char) left[i]);
-		equalizer.left[i] = (signed char) left[i];
+		equalizer.left[i]  = (signed char) left[i];
 		equalizer.right[i] = (signed char) right[i];
 	}
-	printf ("\n");
 
 	RETVAL = control_message_send (
 		control,

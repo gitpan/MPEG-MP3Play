@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.46 2001/01/05 22:05:29 joern Exp $
+# $Id: MP3Play.pm,v 1.48 2001/11/02 08:38:18 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -740,6 +740,17 @@ sub set_player_mode {
 	) == &XA_SUCCESS;
 }
 
+sub set_input_position_range {
+        my $self = shift;
+        my($ipr) = @_;
+
+        control_message_send_I (
+                $self->{player},
+                &XA_MSG_SET_INPUT_POSITION_RANGE,
+                $ipr
+        ) == &XA_SUCCESS;       
+}  
+
 sub get_command_read_pipe {
 	my $self = shift;
 	
@@ -950,7 +961,7 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
-This README and the documention cover version 0.14 of the
+This README and the documention cover version 0.15 of the
 MPEG::MP3Play module.
 
 =head1 PREREQUISITES
@@ -972,10 +983,6 @@ support is actually beta. If you have problems with this
 version, please send me an email (see bug report section below)
 and downgrade to 3.0.x if you can't get sleep ;)
 
-If you have still problems, also with 3.0.8, please use MPEG::MP3Play
-version 0.13. This version is absolutely stable in conjunction with
-Xaudio 3.0.8.
-
 For Linux Users:
 
 Xaudio removed the 3.0.8 Linux version from their developer page.
@@ -987,10 +994,10 @@ package from here:
 
 B<Perl>
 
-I built and tested this module using Perl 5.005_03 and Perl 5.004_04.
-It should work also with Perl 5.004_05 and Perl 5.6, but I did not test this. If
+I built and tested this module using Perl 5.6.1, Perl 5.005_03, Perl 5.004_04.
+It should work also with Perl 5.004_05 and Perl 5.6.0, but I did not test this. If
 someone builds MPEG::MP3Play successfully with other versions of Perl,
-plesase drop me a note.
+please drop me a note.
 
 B<Optionally used Perl modules>
 
@@ -1083,8 +1090,7 @@ uses subclassing for implementing messages handlers.
 
 =item B<synopsis.pl>
 
-This one proves that the usage shown in the SYNOPSIS
-I<really> works ;)
+Just proving it ;)
 
 =back
 
@@ -1283,6 +1289,20 @@ Refer to the Xaudio documentation for details about this flags.
 
 You can import this constants to your namespace using the ':state' tag
 (see CONSTANTS section below).
+
+=item B<set_input_position_range>
+
+$sent = $mp3->set_input_position_range ( $range )
+
+This method sets the player's position range. This is used by the
+player to know how frequently to send back XA_MSG_NOTIFY_INPUT_POSITION
+message (see details about message handling below) to notify of the
+current stream's position. The default is 400, which means
+that the input stream has 400 discrete positions that can be notified.
+
+Example: if you wish to display the current position in a
+display that is 200 pixels wide, you should set the position range to
+200, so the player will not send unnecessary notifications.
 
 =back
 

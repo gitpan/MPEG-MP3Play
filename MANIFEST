@@ -17,6 +17,7 @@ samples/synopsis.pl
 samples/MyMP3Play.pm
 tools/gen_conv_msg
 tools/gen_constant
+tools/genreadme
 version/0.0/constants.h
 version/0.0/conv_msg.c
 version/2.2/constants.h
