@@ -1,6 +1,8 @@
 use strict;
 use MPEG::MP3Play qw(:msg :state);
 
+$| = 1;
+
 BEGIN {
 	eval "use Gtk";
 	if ( $@ ) {

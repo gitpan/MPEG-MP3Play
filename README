@@ -12,7 +12,7 @@ SYNOPSIS
 DESCRIPTION
     This Perl module enables you to playback MPEG music.
 
-    This README and the documention cover version 0.11 of the
+    This README and the documention cover version 0.12 of the
     MPEG::MP3Play module.
 
 PREREQUISITES
@@ -61,6 +61,7 @@ INSTALLATION
 
       make
       make test
+      cp /a/sample/mp3/file.mp3 test.mp3
       ./runsample play.pl
       ./runsample handler.pl
       ./runsample gtk.pl
@@ -183,8 +184,8 @@ MPEG::MP3Play APPLICATIONS
     like (or not like ;) this module.
 
 TESTED ENVIRONMENTS
-    This section will list the environments where this module is
-    known to function well:
+    This section lists the environments where users reported me that
+    this module functions well:
 
       - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
         Linux 2.2.10, Xaudio SDK 3.01 glibc6,
@@ -192,6 +193,8 @@ TESTED ENVIRONMENTS
 
       - FreeBSD 3.2 and 3.3. See README.FreeBSD for details
         about building MPEG::MP3Play for this platform.
+
+      - Irix 6.x, Perl built with -n32
 
 AUTHOR
     Joern Reder <joern@zyn.de>
@@ -209,7 +212,15 @@ SEE ALSO
     perl(1), MPEG::MP3Info.
 
 CHANGES
+    $Id: Changes,v 1.24 2000/09/29 16:42:01 joern Exp $
+
     Revision history for Perl extension MPEG::MP3Play.
+
+    0.12  Fri Sep 29 2000, joern
+	- Due to a bug in the Irix version of the Xaudio SDK the
+	  Makfile.PL needs to determine Irix. -laudio is added in
+	  this case. This version is only a bugfix release for
+	  Irix systems, all other users need not to update.
 
     0.11  Thu Sep 28 2000, joern
 	- actual Xaudio releases lacks the control_message_s?print

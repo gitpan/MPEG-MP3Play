@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.43 1999/10/09 16:04:17 joern Exp $
+# $Id: MP3Play.pm,v 1.44 2000/09/29 16:42:02 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -951,7 +951,7 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
-This README and the documention cover version 0.11 of the
+This README and the documention cover version 0.12 of the
 MPEG::MP3Play module.
 
 =head1 PREREQUISITES
@@ -1003,6 +1003,7 @@ and library files are installed.
 
   make
   make test
+  cp /a/sample/mp3/file.mp3 test.mp3
   ./runsample play.pl
   ./runsample handler.pl
   ./runsample gtk.pl
@@ -1659,8 +1660,8 @@ you like (or not like ;) this module.
 
 =head1 TESTED ENVIRONMENTS
 
-This section will list the environments where this module
-is known to function well:
+This section lists the environments where users reported
+me that this module functions well:
 
   - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
     Linux 2.2.10, Xaudio SDK 3.01 glibc6,
@@ -1668,6 +1669,8 @@ is known to function well:
 
   - FreeBSD 3.2 and 3.3. See README.FreeBSD for details
     about building MPEG::MP3Play for this platform.
+
+  - Irix 6.x, Perl built with -n32
 
 =head1 AUTHOR
 

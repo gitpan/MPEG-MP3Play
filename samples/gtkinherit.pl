@@ -2,6 +2,8 @@ use strict;
 use lib "samples";
 use MyMP3Play;
 
+$| = 1;
+
 BEGIN {
 	eval "use Gtk";
 	if ( $@ ) {

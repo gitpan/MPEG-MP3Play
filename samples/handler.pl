@@ -2,6 +2,8 @@ use strict;
 use MPEG::MP3Play qw(:mask :state);
 use Term::ReadKey;
 
+$| = 1;
+
 END { ReadMode(0) }
 
 main: {

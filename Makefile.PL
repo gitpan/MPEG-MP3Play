@@ -2,7 +2,7 @@ use strict;
 use ExtUtils::MakeMaker;
 use Config;
 
-# $Id: Makefile.PL,v 1.8 1999/09/25 13:30:15 joern Exp $
+# $Id: Makefile.PL,v 1.9 2000/09/29 16:42:04 joern Exp $
 
 my $SDK_DIR = '/usr/local/xaudiosdk';
 
@@ -15,13 +15,16 @@ main: {
 
 	WriteRunsample();
 
+	# determine additional libs for this platform
+	my $add_libs = get_add_libs();
+
 	# See lib/ExtUtils/MakeMaker.pm for details of how to influence
 	# the contents of the Makefile that is written.
 
 	WriteMakefile(
 	    'NAME'	=> 'MPEG::MP3Play',
 	    'VERSION_FROM' => 'MP3Play.pm',
-	    'LIBS'	=> ["-L$sdk_dir/lib -lxaudio"],
+	    'LIBS'	=> ["-L$sdk_dir/lib -lxaudio $add_libs"],
 	    'DEFINE'	=> '',
 	    'INC'	=> "-I$sdk_dir/include",
 	    'MYEXTLIB'	=> 'conv_msg.o',
@@ -60,4 +63,12 @@ sub get_sdk_directory {
 	} while ( not $ok );
 
 	return $sdk_dir;
+}
+
+sub get_add_libs {
+	# on Irix -laudio is needed due to a bug in the Xaudio SDK
+	if ( $Config{osname} =~ /irix/i ) {
+		print "Irix detected! Adding '-laudio'.\n";
+		return '-laudio';
+	}
 }
