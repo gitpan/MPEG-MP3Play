@@ -13,11 +13,11 @@
 #include "player.h"
 #include "control.h"
 
-void
-convert_message_to_HV ( HV* msg_href, XA_Message* message ) {
+SV*
+convert_message_to_HV ( XA_Message* message ) {
 	HV*	msg_hash;
 	
-	msg_hash = (HV*) SvRV(msg_href); 
+	msg_hash = newHV();
 	
 	/* first, store the message code */
 	
@@ -598,4 +598,6 @@ convert_message_to_HV ( HV* msg_href, XA_Message* message ) {
 		default:
 			break;
 	}
+
+	return newRV_noinc((SV*)msg_hash);
 }

@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.13 1999/09/06 19:43:33 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.16 1999/09/08 08:43:32 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -16,6 +16,10 @@
  */
 
 #include "./constants.h"
+
+/* prototype for conv_msg.c function */
+
+SV* convert_message_to_HV (XA_Message* message);
 
 /* h2xs stuff */
 
@@ -196,48 +200,40 @@ CODE:
 
 #---- control_message_wait
 
-int
-control_message_wait (control, msg_href, timeout)
+SV*
+control_message_wait (control, timeout)
 	void *	control
-	SV *	msg_href
 	int	timeout
 
 	CODE:
 	XA_Message	msg;
-	int		status;
-	
-	status = control_message_wait (control, &msg, timeout);
 
-	if ( status == XA_SUCCESS ) {
-		convert_message_to_HV (msg_href, &msg);
-		status = 1;
+	if ( control_message_wait (control, &msg, timeout) == XA_SUCCESS ) {
+		RETVAL = convert_message_to_HV (&msg);
 	} else {
-		status = 0;
+		RETVAL = &PL_sv_undef;
 	}
 
-	RETVAL = status;
+	OUTPUT:
+	RETVAL
 
 #---- control_message_get
 
-int
-control_message_get (control, msg_href)
+SV*
+control_message_get (control)
 	void *	control
-	SV *	msg_href
 
 	CODE:
 	XA_Message	msg;
-	int		status;
 	
-	status = control_message_get (control, &msg);
-
-	if ( status == XA_SUCCESS ) {
-		convert_message_to_HV (msg_href, &msg);
-		status = 1;
+	if ( control_message_get (control, &msg) > 0 ) {
+		RETVAL = convert_message_to_HV (&msg);
 	} else {
-		status = 0;
+		RETVAL = &PL_sv_undef;
 	}
 
-	RETVAL = status;
+	OUTPUT:
+	RETVAL
 
 #---- command_read_pipe
 
@@ -250,52 +246,3 @@ command_read_pipe (control)
 	
 	OUTPUT:
 	RETVAL
-
-
-#---- memory leak test sub
-
-#SV*
-#test_hash_return(void)
-#
-#	CODE:
-#	HV*	msg_hash;
-#	msg_hash = newHV();
-#	
-#	hv_store (msg_hash,
-#		"code", 4,
-#		newSViv (42),
-#		0
-#	);
-#
-#	ST(0) = sv_newmortal();
-#	sv_setsv (ST(0),newRV_noinc(msg_hash));
-#
-#
-#SV*
-#test_scalar_return(void)
-#
-#	CODE:
-#	SV*	test;
-#
-#	test = newSViv(42);
-#
-#	ST(0) = sv_newmortal();
-#
-#	sv_setsv (ST(0),newRV_noinc(test);
-
-
-void
-test_hash_set (href)
-	SV *	href
-
-	CODE:
-	HV*	hash;
-	
-	hash = (HV*) SvRV(href);
-	
-	hv_store (hash,
-		"code", 4,
-		newSViv (42),
-		0
-	);
-

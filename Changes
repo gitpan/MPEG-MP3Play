@@ -1,5 +1,13 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.07  Wed Sep 08 1999, joern
+	- Bugfix: $mp3->get_message was broken in Version 0.06,
+	  among other things the gtk* samples suffered from this
+	  bug and did not function
+	- the creation of the message hash in MP3Play.xs and
+	  conv_msg.c is now much more elegant. Thanks to
+	  Dan Sugalski <dan@tuatha.sidhe.org> for the hint.
+
 0.06  Mon Sep 06 1999, joern
 	- fixed a memory leak in the get_message* methods.
 	  Thanks to Gene Senyszyn <scatt@goes.com> for the

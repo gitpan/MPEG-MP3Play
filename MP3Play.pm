@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.29 1999/09/06 19:43:32 joern Exp $
+# $Id: MP3Play.pm,v 1.32 1999/09/08 08:43:31 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -630,30 +630,22 @@ sub volume {
 
 sub get_message {
 	my $self = shift;
-	my %msg_hash;
 	
-	control_message_get (
-		\%msg_hash,
+	return control_message_get (
 		$self->{player}
 	);
-
-	return \%msg_hash;
 }
 
 sub get_message_wait {
 	my $self = shift;
 	my ($timeout) = @_;
-	my %msg_hash;
-	
+
 	$timeout ||= &XA_TIMEOUT_INFINITE;
 
-	control_message_wait (
+	return control_message_wait (
 		$self->{player},
-		\%msg_hash,
 		$timeout
 	);
-
-	return \%msg_hash;	
 }
 
 sub set_notification_mask {
@@ -1136,7 +1128,7 @@ instead.
 $msg_href = $mp3->get_message_wait ( [$timeout] );
 
 This method will wait max. $timeout microseconds, if there
-is no method in the queue. If $timeout is omitted it will
+is no message in the queue. If $timeout is omitted it will
 block until the next message appears. The message will be
 returned as a hash reference.
 
