@@ -71,7 +71,7 @@ sub work {
 	# message processing
 
 	# read a key, non blocking
-	my $key = Term::ReadKey::ReadKey(-1);
+	my $key = Term::ReadKey::ReadKey(-1) || '';
 
 	# return false if 'q' is pressed. The builtin message
 	# exits on false.
@@ -79,40 +79,40 @@ sub work {
 
 	# volume control
 	my $data = $mp3->get_user_data;
-	my $volume = $data->{volume};
+	my $volume = $data->{'volume'};
 
 	if ( $key eq '+' ) {
 		$volume += 5;
 		$volume = 100 if $volume > 100;
 		$mp3->volume ($volume);
-		print "\n" if $data->{debug} eq 'on';
+		print "\n" if $data->{'debug'} eq 'on';
 	} elsif ( $key eq '-' ) {
 		$volume -= 5;
 		$volume = 0 if $volume < 0;
 		$mp3->volume ($volume);
-		print "\n" if $data->{debug} eq 'on';
+		print "\n" if $data->{'debug'} eq 'on';
 	} elsif ( $key eq 's' ) {
 		$mp3->stop;
-		print "\n" if $data->{debug} eq 'on';
+		print "\n" if $data->{'debug'} eq 'on';
 	} elsif ( $key eq 'm' ) {
 		$mp3->pause;
-		print "\n" if $data->{debug} eq 'on';
+		print "\n" if $data->{'debug'} eq 'on';
 	} elsif ( $key eq 'p' ) {
 		$mp3->play;
-		print "\n" if $data->{debug} eq 'on';
+		print "\n" if $data->{'debug'} eq 'on';
 	} elsif ( $key eq 'd' ) {
-		if ( $data->{debug} eq 'on' ) {
+		if ( $data->{'debug'} eq 'on' ) {
 			$mp3->debug ('none');
-			$data->{debug} = 'off';
+			$data->{'debug'} = 'off';
 			print "debugging is off\n";
 		} else {
 			$mp3->debug ('all');
-			$data->{debug} = 'on';
+			$data->{'debug'} = 'on';
 			print "debugging is on\n";
 		}
 	}
 	
-	$data->{volume} = $volume;
+	$data->{'volume'} = $volume;
 
 	# always return true in a message handler
 	1;

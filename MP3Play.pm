@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.34 1999/09/21 21:49:20 joern Exp $
+# $Id: MP3Play.pm,v 1.40 1999/09/25 13:30:14 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -473,25 +473,23 @@ error=> [qw (
 )]);
 
 sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.  If a constant is not found then an exception will be
-    # croaked. This is catched when trying to execute a message method
-    # or exits the program.
+	my $constname;
+	($constname = $AUTOLOAD) =~ s/.*:://;
+ 	croak "& not defined" if $constname eq 'constant';
 
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "& not defined" if $constname eq 'constant';
-    my $val = constant($constname, @_ ? $_[0] : 0);
-    if ($! != 0) {
-        if ($! =~ /Invalid/) {
-            croak "MP3Play autoload error: '$constname' unknown";
-        } else {
-            croak "Your vendor has not defined test macro $constname";
-        }
-    }
-    no strict 'refs';
-    *$AUTOLOAD = sub { $val };
-    goto &$AUTOLOAD;
+	my $val = constant($constname, 0);
+
+	if ($! != 0) {
+		if ($! =~ /Invalid/) {
+			croak "MP3Play autoload error: '$constname' unknown";
+	        } else {
+			croak "Your vendor has not defined test macro $constname";
+		}
+	}
+	no strict 'refs';
+	*$AUTOLOAD = sub { $val };
+
+	goto &$AUTOLOAD;
 }
 
 bootstrap MPEG::MP3Play $VERSION;
@@ -501,12 +499,12 @@ sub new {
 	my %par = @_;
 	
 	croak "debug => { 'err' | 'all' }"
-		if $par{debug} and $par{debug} ne 'err'
-			       and $par{debug} ne 'all';
+		if $par{'debug'} and $par{'debug'} ne 'err'
+			       and $par{'debug'} ne 'all';
 	
 	my $self = {
 		player => new_player(),
-		debug => $par{debug}
+		debug => $par{'debug'} || ''
 	};
 	
 	return bless $self, $type;
@@ -528,7 +526,7 @@ sub debug {
 		   $debug ne 'all' and $debug ne 'none';
 	$debug = '' if $debug eq 'none';
 
-	$self->{debug} = $debug;
+	$self->{'debug'} = $debug;
 
 	1;
 }
@@ -537,7 +535,7 @@ sub open {
 	my $self = shift;
 
 	my ($filename) = @_;
-	
+
 	control_message_send_S (
 		$self->{player},
 		&XA_MSG_COMMAND_INPUT_OPEN,
@@ -654,9 +652,9 @@ sub set_notification_mask {
 	
 	my $mask = 0;
 	
-	if ( $self->{debug} ) {
+	if ( $self->{'debug'} ) {
 		$mask  = &XA_NOTIFY_MASK_NACK;
-		$mask |= &XA_NOTIFY_MASK_ACK if $self->{debug} eq 'all';
+		$mask |= &XA_NOTIFY_MASK_ACK if $self->{'debug'} eq 'all';
 	}
 	
 	for (@_) { $mask |= $_ }
@@ -822,7 +820,7 @@ sub msg_notify_player_state {
 sub msg_notify_ack {
 	my $self = shift;
 
-	return 1 if not $self->{debug} eq 'all';
+	return 1 if not $self->{'debug'} eq 'all';
 	
 	my ($msg) = @_;
 	
@@ -837,7 +835,7 @@ sub msg_notify_ack {
 sub msg_notify_nack {
 	my $self = shift;
 
-	return 1 if not $self->{debug};
+	return 1 if not $self->{'debug'};
 	
 	my ($msg) = @_;
 	
@@ -870,7 +868,7 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
-This README and the documention cover version 0.08 of the
+This README and the documention cover version 0.09 of the
 MPEG::MP3Play module.
 
 =head1 PREREQUISITES
@@ -926,6 +924,7 @@ and library files are installed.
   ./runsample handler.pl
   ./runsample gtk.pl
   ./runsample gtkhandler.pl
+  ./runsample gtkinherit.pl
   ./runsample synopsis.pl
   make install
 
@@ -967,6 +966,16 @@ This script does the same as gtk.pl but uses the builtin
 message handler concept instead of implementing message
 handling by itself. Advantage of using the builtin message
 handler: no global variables are necessary anymore.
+
+Because 'runsample' uses 'C<perl -w>' you'll get a warning
+message here complaining about a subroutine redefinition.
+See the section USING THE BUILTIN MESSAGE HANDLER for a
+discussion about this.
+
+=item B<gtkinherit.pl>
+
+This is 'gtkhandler.pl' but throwing no warnings, because it
+uses subclassing for implementing messages handlers.
 
 =item B<synopsis.pl>
 
@@ -1011,7 +1020,7 @@ The debugging is implemented by the methods B<msg_notify_ack>
 and B<msg_notify_nack> and works only if you use the builtin
 message handler. You can overload them to set up a private error
 handling (see chapter USING THE BUILTIN MESSAGE HANDLER for
-details)
+details).
 
 =item B<debug>
 
@@ -1262,7 +1271,7 @@ The message handler is called with two parameters:
 the object instance $mp3 and the $msg_href returned by
 the get_message_wait method.
 
-B<Hint>
+B<Redefining or Subclassing?>
 
 It's implicitly said above, but I want to mention it
 explicitly: you must define your message handlers
@@ -1271,7 +1280,21 @@ of the MPEG::MP3Play class. So say 'B<package MPEG::MP3Play>'
 before writing your handlers.
 
 Naturally you can subclass the MPEG::MP3Play module and
-implement your message handlers this way. It's up to you.
+implement your message handlers this way. See
+'samples/gtkinherit.pl' as a sample for this.
+
+The disadvantage of simply placing your message handler
+subroutines into the MPEG::MP3Play package is that 'C<perl -w>'
+throws warning messages like
+
+  Subroutine msg_notify_player_state redefined
+
+if you redefine methods that are already defined by
+MPEG::MP3Play. Real subclassing is much prettier but
+connected with a little more effort. It's up to you.
+
+As a sample for the "dirty" approach see 'samples/gtkhandler.pl'
+It throws the message mentioned above.
 
 B<Doing some work>
 
@@ -1302,7 +1325,7 @@ This method processes all messages in the queue using
 the invocation mechanism described above. It returns
 immediately when there are no messages to process.
 You can use this as an input handler for the
-Gtk::Gdk->input_add call, see samples/gtkhandler.pl
+Gtk::Gdk->input_add call, see 'samples/gtkhandler.pl'
 for an example of this.
 
 =back
@@ -1377,7 +1400,7 @@ MPEG::MP3Play knows all defined constants, but does not
 export them to the callers namespace by default.
 
 MPEG::MP3Play uses the standard Exporter mechanisms to export
-symbols to your namespace. There are defined some tags to
+symbols to your namespace. There are some tags defined to
 group the symbols (see Exporter manpage on how to use them):
 
 =over 8
@@ -1421,6 +1444,39 @@ symbols directly.
 No import to your namespace at all is needed unless you want to
 use $mp3->set_notification_mask or $mp3->set_player_mode!
 
+=head1 USING THE MODULE WITH GTK+
+
+If you want to develop your own MP3 player using MPEG::MP3Play
+in conjunction with Gtk+ this is generally a really good idea.
+However, there is one small issue regarding this configuration.
+
+First off you have to connect the Xaudio message queue to the
+Gtk message handler using something like this (see the example
+program 'gtkhandler.pl'):
+
+  my $input_fd = $mp3->get_command_read_pipe;
+  my $input_tag = Gtk::Gdk->input_add (
+          $input_fd,
+          'read',
+          sub { $mp3->process_messages_nowait }
+  );
+
+Through this the Xaudio process is directly connected by a pipe
+to Gtk+.
+
+I don't know exactly what happens, but if you *first* call
+Gtk->init and then create a MPEG::MP3Play object you'll get
+some Gdk warning messages (BadIDChoice) or a 'Broken Pipe'
+error when your program exits.
+
+Obviously Xaudio and Gtk+ disagree about the correct order
+of closing the pipe. You're welcome if you know a better
+explanation for this.
+
+However, if you *first* create a MPEG::MP3Play object and then
+call Gtk->init everything works well (see the samples/gtk*
+programs).
+
 =head1 TODO
 
   - Win32 support
@@ -1428,25 +1484,18 @@ use $mp3->set_notification_mask or $mp3->set_player_mode!
     modules, etc.
   - documentation: more details about the messages
     hashes
-  - runsample.bat for Win32
 
 Ideas, code and any help are very appreciated.
 
 =head1 BUGS
 
-  - samples/gtk*.pl throw some Gdk messages on exit.
-    (not really a MPEG::MP3Play bug, I fear it documents
-    that I'm a beginner in coding Gtk+ applications ;)
-    Who is able to fix this and is so kind to send me the
-    patch? ;)
-  - the runsample script currently works only under
-    Unix, it will fail under Win32
+Currently there are no known bugs.
 
-=head1 REPORTING BUGS
+=head1 PROBLEMS AND REPORTING BUGS
 
 First check if you're using the most recent version of this
 module, maybe the bug you're about to report is already
-fixed.
+fixed. Also please read the documentation entirely.
 
 If you find a bug please send me a report. I will fix this as
 soon as possible. You'll make my life easier if you provide
@@ -1455,7 +1504,8 @@ the following information along with your bugreport:
   - your OS and Perl version (please send me the output
     of 'perl -V')
   - exact version number of the Xaudio development kit
-    you're using (including libc version, if matters)
+    you're using (including libc version, if this is relevant
+    for your OS, e.g. Linux)
   - for bug reports regarding the GTK+ functionality
     I need the version number of your GTK+ library and
     the version number of your Perl Gtk module.
@@ -1473,10 +1523,10 @@ sound configuration and not a MPEG::MP3Play issue. Please check
 the Xaudio documentation in this case, before contacting me.
 Thanks.
 
-=head1 MPEG::MP3PLay APPLICATIONS
+=head1 MPEG::MP3Play APPLICATIONS
 
-Also I'm very interested to know, if someone write applications
-based on this module. So don't hesitate to send me an email, if
+I'm very interested to know, if someone write applications
+based on MPEG::MP3Play. So don't hesitate to send me an email, if
 you like (or not like ;) this module.
 
 =head1 TESTED ENVIRONMENTS
@@ -1487,6 +1537,9 @@ is known to function well:
   - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
     Linux 2.2.10, Xaudio SDK 3.01 glibc6,
     gtk+ 1.2.3, Perl Gtk 0.5121
+
+  - FreeBSD 3.2 and 3.3. See README.FreeBSD for details
+    about building MPEG::MP3Play for this platform.
 
 =head1 AUTHOR
 

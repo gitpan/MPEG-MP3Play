@@ -67,7 +67,7 @@ sub print_status {
 		}
 	
 		if ( $has_readkey ) {
-			my $key = ReadKey(-1);
+			my $key = ReadKey(-1) || '';
 			$finish = 1 if $key eq 'q';
 			if ( $key eq '+' ) {
 				$volume += 5;

@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.17 1999/09/21 21:49:21 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.18 1999/09/24 09:23:27 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -25,7 +25,7 @@ SV* convert_message_to_HV (XA_Message* message);
 
 MODULE = MPEG::MP3Play		PACKAGE = MPEG::MP3Play		
 
-PROTOTYPES: ENABLE
+PROTOTYPES: DISABLE
 
 double
 constant(name,arg)

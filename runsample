@@ -1,2 +1,0 @@
-#!/bin/sh
-perl -Iblib/arch -Iblib/lib samples/$1

@@ -7,6 +7,9 @@ BEGIN {
 		print "Sorry, no GTK module installed!\n";
 		exit;
 	}
+	print "\nThe warning message 'Subroutine msg_notify_player_state redefined'\n";
+	print "is intended. Please refer to the documentation to find out more\n";
+	print "about this.\n\n";
 }
 
 main: {
@@ -17,26 +20,30 @@ main: {
 		print "You should hear it if you run 'runsample gtk.pl' again.\n";
 	}
 	
+	# we need to create the MPEG::MP3Player instance *before* intializing
+	# Gtk to prevent from Gdk broken pipe related error messages on
+	# program exit
+
+	my $mp3 = new MPEG::MP3Play;
+	
 	# create simple window with progress bar
 
 	init Gtk;
-	my $pbar = create_window();
+	my $pbar = create_window($mp3);
 	
-	# create mp3 thread for playing triggering the progress bar,
+	# play the file triggering the progress bar,
 	# connect Xaudio message queue to Gdk input
 
-	my $mp3 = create_mp3 ($pbar);
+	play ($mp3, $pbar);
 	
 	# Gtk event loop (handles the Xaudio messages too)
 
 	Gtk->main;
 }
 
-sub create_mp3 {
-	my ($pbar) = @_;
+sub play {
+	my ($mp3, $pbar) = @_;
 
-	my $mp3 = new MPEG::MP3Play;
-	
 	$mp3->open ("test.mp3");
 	$mp3->play;
 
@@ -52,11 +59,11 @@ sub create_mp3 {
 		input_tag => $input_tag,
 		pbar => $pbar
 	});
-	
-	return $mp3;
 }
 
 sub create_window {
+	my ($mp3) = @_;
+
 	my($pbar,$window,$button,$vbox,$label);
 	
 	$window = new Gtk::Dialog;

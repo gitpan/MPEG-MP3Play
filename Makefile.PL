@@ -1,7 +1,8 @@
 use strict;
 use ExtUtils::MakeMaker;
+use Config;
 
-# $Id: Makefile.PL,v 1.7 1999/08/06 11:02:23 joern Exp $
+# $Id: Makefile.PL,v 1.8 1999/09/25 13:30:15 joern Exp $
 
 my $SDK_DIR = '/usr/local/xaudiosdk';
 
@@ -11,6 +12,8 @@ main: {
 	# determine X-Audio SDK directory
 
 	my $sdk_dir = get_sdk_directory();
+
+	WriteRunsample();
 
 	# See lib/ExtUtils/MakeMaker.pm for details of how to influence
 	# the contents of the Makefile that is written.
@@ -27,6 +30,17 @@ main: {
 	    	'PREOP' => 'perl tools/genreadme > README'
 	    }
 	);
+}
+
+sub WriteRunsample {
+	my $perlpath = $Config{perlpath};
+	open (OUT, "> runsample");
+	print OUT <<__EOF;
+#!/bin/sh
+$perlpath -w -Iblib/arch -Iblib/lib samples/\$1
+__EOF
+	close OUT;
+	chmod 0755, "runsample";
 }
 
 sub get_sdk_directory {
