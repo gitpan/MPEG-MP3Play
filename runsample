@@ -1,0 +1,4 @@
+#!/bin/sh
+
+PERL_DL_NONLAZY=1 perl -Iblib/arch -Iblib/lib samples/$1
+

@@ -1,0 +1,221 @@
+NAME
+    MPEG::MP3Play - Perl extension for playing back MPEG music
+
+SYNOPSIS
+      use MPEG::MP3Play;
+      my $mp3 = new MPEG::MP3Play;
+      
+      $mp3->open ("test.mp3");
+      $mp3->play;
+
+      while ( 1 ) {
+            my $msg = $mp3->get_message_wait;
+            last if ( $msg->{code}  == &XA_MSG_NOTIFY_PLAYER_STATE and
+                      $msg->{state} == &XA_PLAYER_STATE_EOF )
+      }
+
+      $mp3->close;
+      $mp3->exit;
+
+DESCRIPTION
+    This Perl module enables you to playback MPEG music.
+
+PREREQUISITES
+    MPEG::MP3Play is build against the 3.0 version of the Xaudio SDK
+    and uses the async interface of the Xaudio library.
+
+    I don't know if older versions will work properly. The SDK is
+    not part of this distribution, so get and install it first
+    (http://www.xaudio.com/).
+
+    samples/play.pl uses Term::ReadKey if it's installed.
+    samples/gtk.pl depends on Gtk.
+
+INSTALLATION
+    First, generate the Makefile:
+
+      perl Makefile.PL
+
+    You will be prompted for the location of the Xaudio SDK. The
+    directory must contain the include and lib subdirectories, where
+    the Xaudio header and library files are installed.
+
+      make
+      make test
+      ./runsample play.pl
+      ./runsample gtk.pl  
+      make install
+
+SAMPLE SCRIPTS
+    There are two small scripts in the samples directory You can run
+    these script before 'make install' with the runsample script
+    (usage: see above).
+
+    Both scripts expect a mp3 file 'test.mp3' in the actual
+    directory.
+
+    play.pl Textmodus playback. Displays the timecode. Simple volume
+            control with '+' and '-' keys.
+
+    gtk.pl  This script demonstrates the usage of MPEG::MP3Play with the
+            Gtk module. It produces a simple window with a progress
+            bar while playing back the test.mp3 file.
+
+CONSTRUCTOR
+    new     my $mp3 = new MPEG::MP3Play;
+
+            This is the constructor of this class and takes no
+            arguments.
+
+CONTROL METHODS
+    The following methods control the audio playback. Internally
+    they send messages to the Xaudio subsystem. This message passing
+    is completely asynchronyous, so no result values (e.g. sucess)
+    are given back by this methods.
+
+    Instead the Xaudio subsystem sends back acknowledge messages.
+    See the chapter MESSAGE HANDLING for details.
+
+    open    $mp3->open ($filename);
+
+            Opens the MPEG file $filename. No playback is started at
+            this time.
+
+    close   $mp3->close ($filename);
+
+            Closes an opened file.
+
+    exit    $mp3->exit
+
+            The Xaudio thread or process will be canceled.
+
+    play    $mp3->play
+
+            Starts playing back an opened file. Must be called after
+            $mp3->open.
+
+    stop    $mp3->stop
+
+            Stops playing back a playing file. The play position
+            rewinds to the beginning.
+
+    pause   $mp3->pause
+
+            Pauses. $mp3->play will go further at the actual
+            position.
+
+    seek    $mp3->seek ($offset, $range)
+
+            Sets the play position to a specific value. $offset is
+            the position relative to $range. If $range is 100 and
+            $offset is 50, it will be positioned in the middle of
+            the song.
+
+    volume  $mp3->volume ($pcm_level, $master_level, $balance)
+
+            Sets volume parameters. $pcm_level is the level of the
+            actual MPEG audio stream. $master_level is the master
+            level of the sound subsystem. Both values must be set
+            between 0 (silence) and 100 (ear breaking loud).
+
+            A $balance of 50 is the middle, smaller is more left,
+            higher is more right.
+
+MESSAGE HANDLING
+    Currently there are two methods to get messages from the Xaudio
+    subsystem. So it is up to you to set up the message handler by
+    using this methods.
+
+    In the near future MPEG::MP3Play will provide a default message
+    handler which you can customize by overloading the message
+    handler methods.
+
+    get_message
+            $msg_href = $mp3->get_message
+
+            If there is a message in the players message queue, it
+            will be returned as a hash reference immediately. This
+            method will not block, if there is no message. It will
+            return undef instead.
+
+    get_message_wait
+            $msg_href = $mp3->get_message_wait ( [$timeout] )
+
+            This method will wait max. $timeout microseconds, if
+            there is no method in the queue. If $timeout is omitted
+            it will block until the next message appears. The
+            message will be returned as a hash reference.
+
+  The message hash
+
+    The returned messages are references to hashes. Please refer to
+    the Xaudio SDK documentation for details. The message hashes are
+    build 1:1 out of the structs documented there, using _ as a
+    seperator for nested structs.
+
+    (Simply use Data::Dumper to learn more about the message hashes
+    ;)
+
+TODO
+      - Testing of all methods.
+      - implementation of a simple message handler
+      - OO interface for message handling, with the possibility
+        of overloading the message handlers
+      - full documentation of all handled messages
+      - more details about the messages hashes
+      - support of the full Xaudio API, with input/output
+        modules, etc.
+
+    Ideas, code and any help are very appreciated.
+
+BUGS
+      - samples/gtk.pl throws some Gdk messages on exit.
+        (not really a MPEG::MP3Play bug ;)
+
+AUTHOR
+    Joern Reder, joern@netcologne.de
+
+COPYRIGHT
+    Copyright (C) 1999 by Joern Reder, All Rights Reserved.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    The Xaudio SDK is copyright by MpegTV,LLC. Please refer to the
+    LICENSE text published on http://www.xaudio.com/.
+
+SEE ALSO
+    perl(1).
+
+CHANGES
+
+Revision history for Perl extension MPEG::MP3Play.
+
+0.03  Thu Aug 05 1999, joern
+	- gen_constant generates constants.h included by
+	  MP3Play.xs. gen_constant checks defines and enums,
+	  not only defines like h2xs does.
+	- so now all Xaudio symbols are available
+	- gen* scripts moved to the tools directory
+	- test.pl now only loads the module
+	- there are now more sophisticated test scripts in
+	  the samples directory, e.g. a script which uses
+	  Gtk+ to play a file showing a progress bar. This
+	  demonstrates the connection of the Xaudio
+	  message queue to Gdk.
+	  
+0.02  Tue Aug 03 1999, joern
+	- added gen_conv_msg.pl to generate conv_msg.c out
+	  of the HTML documention provided by Xaudio
+	- conv_msg.c converts XA messages to HVs, for simple
+	  handling in Perl
+	- test.pl enhanced. Now shows timecode and exits on
+	  key pressure (if Term::ReadKey is installed) and
+	  on end of file.
+	- fixed minor POD formatting errors in MP3Play.pm
+
+0.01  Sun Jul 25 1999, joern
+	- original version; created by h2xs 1.19
+	- my first contact with XS, but playing mp3 files works
+	  after two hours. I like it! ;)
+	- no error handling at all

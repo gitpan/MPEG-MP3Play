@@ -2,8 +2,14 @@ Changes
 MANIFEST
 MP3Play.pm
 MP3Play.xs
-gen_conv_msg
+README
 conv_msg.c
+constants.h
 Makefile.PL
-test.pl
 typemap
+test.pl
+runsample
+samples/play.pl
+samples/gtk.pl
+tools/gen_conv_msg
+tools/gen_constant

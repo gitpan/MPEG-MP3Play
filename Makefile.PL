@@ -1,6 +1,8 @@
 use strict;
 use ExtUtils::MakeMaker;
 
+# $Id: Makefile.PL,v 1.6 1999/08/04 21:45:21 joern Exp $
+
 my $SDK_DIR = '/usr/local/xaudiosdk';
 
 $| = 1;
@@ -20,6 +22,12 @@ main: {
 	    'DEFINE'	=> '',
 	    'INC'	=> "-I$sdk_dir/include",
 	    'MYEXTLIB'	=> 'conv_msg.o',
+	    'depend'	=> { 'MP3Play.xs' => 'constants.h' },
+	    'dist'	=> {
+	    	'PREOP' => '(pod2text MP3Play.pm;'.
+		           'echo "CHANGES"; echo;'.
+			   'cat Changes) > README'
+	    }
 	);
 }
 
