@@ -66,7 +66,7 @@ sub gen_constant {
 				/^\s*(XA_\w+)/;
 				push @enums, $1 if $1;
 			} else {
-				/^#define (XA_\w+)/;
+				/^#define\s+(XA_\w+)/;
 				push @defines, $1 if $1;
 			}
 		}
@@ -136,7 +136,7 @@ sub gen_code_block {
 	}
 
 	foreach my $sym (@$define_lref) {
-		next if $sym =~ /^XA_NOTIFY/;
+		next if $sym =~ /^(XA_NOTIFY_DEBUG|XA_NOTIFY_ERROR|XA_NOTIFY_PROGRESS)/;
 		$switch{substr($sym,-1,1)} .= 
 			qq{\t\tif (strEQ(name, "$sym"))\n}.
 			qq{#ifdef $sym\n}.

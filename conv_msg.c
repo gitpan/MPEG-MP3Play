@@ -31,9 +31,17 @@ convert_message_to_HV ( XA_Message* message ) {
 
 	switch (message->code) {
 		case XA_MSG_NOTIFY_READY:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_ready", 0),
+				0);
 			break;
 
 		case XA_MSG_NOTIFY_ACK:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_ack", 0),
+				0);
 			hv_store (msg_hash,
 				"ack", 3,
 				newSViv ((IV)message->data.ack),
@@ -41,6 +49,10 @@ convert_message_to_HV ( XA_Message* message ) {
 			break;
 
 		case XA_MSG_NOTIFY_NACK:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_nack", 0),
+				0);
 			hv_store (msg_hash,
 				"nack_command", 12,
 				newSViv ((IV)message->data.nack.command),
@@ -52,9 +64,17 @@ convert_message_to_HV ( XA_Message* message ) {
 			break;
 
 		case XA_MSG_NOTIFY_EXITED:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_exited", 0),
+				0);
 			break;
 
 		case XA_MSG_NOTIFY_PONG:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_pong", 0),
+				0);
 			hv_store (msg_hash,
 				"tag", 3,
 				newSViv ((IV)message->data.tag),
@@ -63,6 +83,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_PLAYER_STATE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_player_state", 0),
+				0);
+			hv_store (msg_hash,
 				"state", 5,
 				newSViv ((IV)message->data.state),
 				0);
@@ -70,12 +94,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_PLAYER_MODE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_player_mode", 0),
+				0);
+			hv_store (msg_hash,
 				"mode", 4,
 				newSViv ((IV)message->data.mode),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_PLAYER_ENVIRONMENT_INTEGER:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_player_environment_integer", 0),
+				0);
 			hv_store (msg_hash,
 				"environment_info_value_integer", 30,
 				newSViv ((IV)message->data.environment_info.value.integer),
@@ -88,6 +120,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_PLAYER_ENVIRONMENT_STRING:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_player_environment_string", 0),
+				0);
+			hv_store (msg_hash,
 				"environment_info_value_string", 29,
 				newSVpv ((char*)message->data.environment_info.value.string, 0),
 				0);
@@ -99,12 +135,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_STATE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_state", 0),
+				0);
+			hv_store (msg_hash,
 				"state", 5,
 				newSViv ((IV)message->data.state),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_NAME:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_name", 0),
+				0);
 			hv_store (msg_hash,
 				"name", 4,
 				newSVpv ((char*)message->data.name, 0),
@@ -113,12 +157,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_CAPS:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_caps", 0),
+				0);
+			hv_store (msg_hash,
 				"caps", 4,
 				newSViv ((IV)message->data.caps),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_POSITION:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_position", 0),
+				0);
 			hv_store (msg_hash,
 				"position_range", 14,
 				newSViv ((IV)message->data.position.range),
@@ -131,12 +183,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_POSITION_RANGE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_position_range", 0),
+				0);
+			hv_store (msg_hash,
 				"range", 5,
 				newSViv ((IV)message->data.range),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_TIMECODE:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_timecode", 0),
+				0);
 			hv_store (msg_hash,
 				"timecode_h", 10,
 				newSViv ((IV)message->data.timecode.h),
@@ -157,6 +217,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_timecode_granularity", 0),
+				0);
+			hv_store (msg_hash,
 				"granularity", 11,
 				newSViv ((IV)message->data.granularity),
 				0);
@@ -164,12 +228,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_DURATION:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_duration", 0),
+				0);
+			hv_store (msg_hash,
 				"duration", 8,
 				newSViv ((IV)message->data.duration),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_STREAM_INFO:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_stream_info", 0),
+				0);
 			hv_store (msg_hash,
 				"stream_info_bitrate", 19,
 				newSViv ((IV)message->data.stream_info.bitrate),
@@ -194,12 +266,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_MODULE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_module", 0),
+				0);
+			hv_store (msg_hash,
 				"module_id", 9,
 				newSViv ((IV)message->data.module_id),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_MODULE_INFO:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_module_info", 0),
+				0);
 			hv_store (msg_hash,
 				"module_info_name", 16,
 				newSVpv ((char*)message->data.module_info.name, 0),
@@ -219,6 +299,10 @@ convert_message_to_HV ( XA_Message* message ) {
 			break;
 
 		case XA_MSG_NOTIFY_INPUT_DEVICE_INFO:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_device_info", 0),
+				0);
 			hv_store (msg_hash,
 				"device_info_index", 17,
 				newSViv ((IV)message->data.device_info.index),
@@ -243,6 +327,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_INPUT_FILTER_INFO:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_input_filter_info", 0),
+				0);
+			hv_store (msg_hash,
 				"filter_info_name", 16,
 				newSVpv ((char*)message->data.filter_info.name, 0),
 				0);
@@ -254,12 +342,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_STATE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_state", 0),
+				0);
+			hv_store (msg_hash,
 				"state", 5,
 				newSViv ((IV)message->data.state),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_NAME:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_name", 0),
+				0);
 			hv_store (msg_hash,
 				"name", 4,
 				newSVpv ((char*)message->data.name, 0),
@@ -268,12 +364,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_CAPS:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_caps", 0),
+				0);
+			hv_store (msg_hash,
 				"caps", 4,
 				newSViv ((IV)message->data.caps),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_VOLUME:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_volume", 0),
+				0);
 			hv_store (msg_hash,
 				"volume_master_level", 19,
 				newSViv ((IV)message->data.volume.master_level),
@@ -290,12 +394,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_BALANCE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_balance", 0),
+				0);
+			hv_store (msg_hash,
 				"volume_balance", 14,
 				newSViv ((IV)message->data.volume.balance),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_PCM_LEVEL:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_pcm_level", 0),
+				0);
 			hv_store (msg_hash,
 				"volume_pcm_level", 16,
 				newSViv ((IV)message->data.volume.pcm_level),
@@ -304,12 +416,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_MASTER_LEVEL:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_master_level", 0),
+				0);
+			hv_store (msg_hash,
 				"volume_master_level", 19,
 				newSViv ((IV)message->data.volume.master_level),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_CHANNELS:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_channels", 0),
+				0);
 			hv_store (msg_hash,
 				"channels", 8,
 				newSViv ((IV)message->data.channels),
@@ -318,6 +438,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_PORTS:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_ports", 0),
+				0);
+			hv_store (msg_hash,
 				"ports", 5,
 				newSViv ((IV)message->data.ports),
 				0);
@@ -325,12 +449,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_MODULE:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_module", 0),
+				0);
+			hv_store (msg_hash,
 				"module_id", 9,
 				newSViv ((IV)message->data.module_id),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_MODULE_INFO:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_module_info", 0),
+				0);
 			hv_store (msg_hash,
 				"module_info_name", 16,
 				newSVpv ((char*)message->data.module_info.name, 0),
@@ -350,6 +482,10 @@ convert_message_to_HV ( XA_Message* message ) {
 			break;
 
 		case XA_MSG_NOTIFY_OUTPUT_DEVICE_INFO:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_device_info", 0),
+				0);
 			hv_store (msg_hash,
 				"device_info_index", 17,
 				newSViv ((IV)message->data.device_info.index),
@@ -374,6 +510,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_OUTPUT_FILTER_INFO:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_output_filter_info", 0),
+				0);
+			hv_store (msg_hash,
 				"filter_info_name", 16,
 				newSVpv ((char*)message->data.filter_info.name, 0),
 				0);
@@ -385,12 +525,20 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_NOTIFICATION_MASK:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_notification_mask", 0),
+				0);
+			hv_store (msg_hash,
 				"notification_mask", 17,
 				newSViv ((IV)message->data.notification_mask),
 				0);
 			break;
 
 		case XA_MSG_NOTIFY_PROGRESS:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_progress", 0),
+				0);
 			hv_store (msg_hash,
 				"progress_message", 16,
 				newSVpv ((char*)message->data.progress.message, 0),
@@ -411,6 +559,10 @@ convert_message_to_HV ( XA_Message* message ) {
 
 		case XA_MSG_NOTIFY_ERROR:
 			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_error", 0),
+				0);
+			hv_store (msg_hash,
 				"error_source", 12,
 				newSViv ((IV)message->data.error.source),
 				0);
@@ -425,6 +577,10 @@ convert_message_to_HV ( XA_Message* message ) {
 			break;
 
 		case XA_MSG_NOTIFY_DEBUG:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_debug", 0),
+				0);
 			hv_store (msg_hash,
 				"debug_message", 13,
 				newSVpv ((char*)message->data.debug.message, 0),

@@ -1,5 +1,30 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.04  Sat Aug 07 1999, joern
+	- implemented a builtin message handler mechanism.
+	  Message corresponding methods will be invoked,
+	  so the user can simply supply/overload the message
+	  methods.
+	- added samples/handler.pl and samples/gtkhandler.pl
+	  to demonstrate the use of the builtin message handler.
+	- added samples/synopsis.pl. This proves that the
+	  usage shown in the SYNOPSIS really works ;)
+	- no symbols are exported by default anymore, some
+	  Exporter tags are available instead.
+
+	  THIS IS AN INCOMPATIBLE CHANGE.
+
+	  Try 'use MPEG::MP3Play qw(:DEFAULT)' as a first step,
+	  but better look into the documentation and see, which
+	  symbols you really need to import.
+	  
+	  I think 'use MPEG::MP3Play qw(:msg :state)' will work
+	  in most cases.
+	- notification_mask setting
+	- player mode setting
+	- default message handler for player_state messages
+	- fixed some minor documentation typos
+
 0.03  Thu Aug 05 1999, joern
 	- gen_constant generates constants.h included by
 	  MP3Play.xs. gen_constant checks defines and enums,
@@ -12,7 +37,8 @@ Revision history for Perl extension MPEG::MP3Play.
 	  Gtk+ to play a file showing a progress bar. This
 	  demonstrates the connection of the Xaudio
 	  message queue to Gdk.
-	  
+	- almost anything well documented now
+
 0.02  Tue Aug 03 1999, joern
 	- added gen_conv_msg.pl to generate conv_msg.c out
 	  of the HTML documention provided by Xaudio
@@ -27,4 +53,4 @@ Revision history for Perl extension MPEG::MP3Play.
 	- original version; created by h2xs 1.19
 	- my first contact with XS, but playing mp3 files works
 	  after two hours. I like it! ;)
-	- no error handling at all
+	- no error/message handling at all

@@ -9,11 +9,6 @@ BEGIN {
 	}
 }
 
-my $mp3;
-my $window;
-my $pbar;
-my $input_tag;
-
 main: {
 	# check if test.mp3 exists
 
@@ -25,48 +20,44 @@ main: {
 	# create simple window with progress bar
 
 	init Gtk;
-	create_window();
+	my $pbar = create_window();
 	
-	# create mp3 thread for playing, connect Xaudio
-	# message queue to Gdk input
+	# create mp3 thread for playing triggering the progress bar,
+	# connect Xaudio message queue to Gdk input
 
-	play();
+	my $mp3 = create_mp3 ($pbar);
 	
 	# Gtk event loop (handles the Xaudio messages too)
 
 	Gtk->main;
 }
 
-sub play {
-	$mp3 = new MPEG::MP3Play;
+sub create_mp3 {
+	my ($pbar) = @_;
+
+	my $mp3 = new MPEG::MP3Play;
 	
 	$mp3->open ("test.mp3");
 	$mp3->play;
 
 	my $input_fd = $mp3->get_command_read_pipe;
 
-	$input_tag = Gtk::Gdk->input_add ($input_fd, 'read', \&mp3_message_handler);
+	my $input_tag = Gtk::Gdk->input_add (
+		$input_fd,
+		'read',
+		sub { $mp3->process_messages_nowait }
+	);
+
+	$mp3->set_user_data ({
+		input_tag => $input_tag,
+		pbar => $pbar
+	});
 	
 	return $mp3;
 }
 
-sub mp3_message_handler {
-	my $msg;
-	while ( $msg = $mp3->get_message ) {
-
-		my $code = $msg->{code};
-
-		if ( $code == &XA_MSG_NOTIFY_INPUT_POSITION ) {
-			my $percent = $msg->{position_offset}/$msg->{position_range};
-			$pbar->update($percent);
-		} elsif ( $code == &XA_MSG_NOTIFY_PLAYER_STATE ) {
-			cleanup_and_exit() if $msg->{state} == &XA_PLAYER_STATE_EOF;
-		}
-	}
-}
-
 sub create_window {
-	my($button,$vbox,$label);
+	my($pbar,$window,$button,$vbox,$label);
 	
 	$window = new Gtk::Dialog;
 	signal_connect $window "destroy" => \&cleanup_and_exit, \$window;
@@ -98,10 +89,33 @@ sub create_window {
 	
 	$window->show;
 	
-	return ($window, $pbar);
+	return $pbar;
 }
 
 sub cleanup_and_exit {
+	my ($input_tag) = @_;
 	Gtk::Gdk->input_remove ($input_tag);
 	exit;
 }	
+
+# message handlers
+
+package MPEG::MP3Play;
+
+sub msg_notify_input_position {
+	my ($mp3, $msg) = @_;
+	
+	my $data = $mp3->get_user_data;
+
+	my $percent = $msg->{position_offset}/$msg->{position_range};
+	$data->{pbar}->update($percent);
+}
+
+sub msg_notify_player_state {
+	my ($mp3, $msg) = @_;
+	
+	my $data = $mp3->get_user_data;
+
+	main::cleanup_and_exit($data->{input_tag})
+		if $msg->{state} == &XA_PLAYER_STATE_EOF;
+}

@@ -143,21 +143,19 @@ sub gen_end_block {
 __EOC
 }
 
-
-my %type = (
-	'char *' 		=> 'newSVpv',
-	'long' 			=> 'newSViv',
-	'short' 		=> 'newSViv',
-	'const char *' 		=> '',
-	'unsigned char' 	=> '',
-	'unsigned long' 	=> '',
-	'unsigned short'	=> '',
-);
-
 sub gen_message_block {
 	my ($fh, $name, $par) = @_;
 	
+	my $method_name = $name;
+	$method_name =~ s/^XA_//;
+	$method_name =~ tr/A-Z/a-z/;
+	
 	print $fh qq{\t\tcase $name:\n};
+
+	print $fh qq{\t\t\thv_store (msg_hash,\n};
+	print $fh qq{\t\t\t\t"_method_name", 12,\n};
+	print $fh qq{\t\t\t\tnewSVpv("$method_name", 0),\n};
+	print $fh qq{\t\t\t\t0);\n};
 
 	my ($var, $type);
 	while ( ($var,$type) = each %{$par} ) {

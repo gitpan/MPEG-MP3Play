@@ -1,5 +1,5 @@
 use strict;
-use MPEG::MP3Play;
+use MPEG::MP3Play qw(:msg :state);
 
 my $has_readkey;
 BEGIN {

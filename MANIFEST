@@ -10,6 +10,9 @@ typemap
 test.pl
 runsample
 samples/play.pl
+samples/handler.pl
 samples/gtk.pl
+samples/gtkhandler.pl
+samples/synopsis.pl
 tools/gen_conv_msg
 tools/gen_constant

@@ -292,6 +292,60 @@ constant(char *name, int arg)
 #else
 			goto not_there;
 #endif
+		if (strEQ(name, "XA_NOTIFY_MASK_PLAYER_STATE"))
+#ifdef XA_NOTIFY_MASK_PLAYER_STATE
+			return XA_NOTIFY_MASK_PLAYER_STATE;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_STATE"))
+#ifdef XA_NOTIFY_MASK_INPUT_STATE
+			return XA_NOTIFY_MASK_INPUT_STATE;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_NAME"))
+#ifdef XA_NOTIFY_MASK_INPUT_NAME
+			return XA_NOTIFY_MASK_INPUT_NAME;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_POSITION_RANGE"))
+#ifdef XA_NOTIFY_MASK_INPUT_POSITION_RANGE
+			return XA_NOTIFY_MASK_INPUT_POSITION_RANGE;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_TIMECODE"))
+#ifdef XA_NOTIFY_MASK_INPUT_TIMECODE
+			return XA_NOTIFY_MASK_INPUT_TIMECODE;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_STATE"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_STATE
+			return XA_NOTIFY_MASK_OUTPUT_STATE;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_NAME"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_NAME
+			return XA_NOTIFY_MASK_OUTPUT_NAME;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_VOLUME"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_VOLUME
+			return XA_NOTIFY_MASK_OUTPUT_VOLUME;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_BALANCE"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_BALANCE
+			return XA_NOTIFY_MASK_OUTPUT_BALANCE;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_FAILURE"))
 #ifdef XA_FAILURE
 			return XA_FAILURE;
@@ -382,6 +436,12 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_DEBUG;
 		if (strEQ(name, "XA_PLAYER_STATE_PLAYING"))
 			return XA_PLAYER_STATE_PLAYING;
+		if (strEQ(name, "XA_NOTIFY_MASK_DEBUG"))
+#ifdef XA_NOTIFY_MASK_DEBUG
+			return XA_NOTIFY_MASK_DEBUG;
+#else
+			goto not_there;
+#endif
 
 		break;
 
@@ -410,6 +470,18 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_NACK;
 		if (strEQ(name, "XA_MSG_NOTIFY_NOTIFICATION_MASK"))
 			return XA_MSG_NOTIFY_NOTIFICATION_MASK;
+		if (strEQ(name, "XA_NOTIFY_MASK_ACK"))
+#ifdef XA_NOTIFY_MASK_ACK
+			return XA_NOTIFY_MASK_ACK;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_NACK"))
+#ifdef XA_NOTIFY_MASK_NACK
+			return XA_NOTIFY_MASK_NACK;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_ERROR_BASE_NETWORK"))
 #ifdef XA_ERROR_BASE_NETWORK
 			return XA_ERROR_BASE_NETWORK;
@@ -436,6 +508,18 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_OUTPUT_MASTER_LEVEL;
 		if (strEQ(name, "XA_MSG_NOTIFY_DEBUG_LEVEL"))
 			return XA_MSG_NOTIFY_DEBUG_LEVEL;
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL
+			return XA_NOTIFY_MASK_OUTPUT_PCM_LEVEL;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_MASTER_LEVEL"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_MASTER_LEVEL
+			return XA_NOTIFY_MASK_OUTPUT_MASTER_LEVEL;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_ERROR_BASE_GENERAL"))
 #ifdef XA_ERROR_BASE_GENERAL
 			return XA_ERROR_BASE_GENERAL;
@@ -496,6 +580,18 @@ constant(char *name, int arg)
 			return XA_INPUT_STATE_OPEN;
 		if (strEQ(name, "XA_OUTPUT_STATE_OPEN"))
 			return XA_OUTPUT_STATE_OPEN;
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_DURATION"))
+#ifdef XA_NOTIFY_MASK_INPUT_DURATION
+			return XA_NOTIFY_MASK_INPUT_DURATION;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_POSITION"))
+#ifdef XA_NOTIFY_MASK_INPUT_POSITION
+			return XA_NOTIFY_MASK_INPUT_POSITION;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_ERROR_HOST_UNKNOWN"))
 #ifdef XA_ERROR_HOST_UNKNOWN
 			return XA_ERROR_HOST_UNKNOWN;
@@ -522,6 +618,12 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_OUTPUT_FILTER_INFO;
 		if (strEQ(name, "XA_OUTPUT_CHANNELS_STEREO"))
 			return XA_OUTPUT_CHANNELS_STEREO;
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_STREAM_INFO"))
+#ifdef XA_NOTIFY_MASK_INPUT_STREAM_INFO
+			return XA_NOTIFY_MASK_INPUT_STREAM_INFO;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_ERROR_BASE_IO"))
 #ifdef XA_ERROR_BASE_IO
 			return XA_ERROR_BASE_IO;
@@ -570,6 +672,18 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_CODEC_EQUALIZER;
 		if (strEQ(name, "XA_MSG_NOTIFY_ERROR"))
 			return XA_MSG_NOTIFY_ERROR;
+		if (strEQ(name, "XA_NOTIFY_MASK_ERROR"))
+#ifdef XA_NOTIFY_MASK_ERROR
+			return XA_NOTIFY_MASK_ERROR;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_CODEC_EQUALIZER"))
+#ifdef XA_NOTIFY_MASK_CODEC_EQUALIZER
+			return XA_NOTIFY_MASK_CODEC_EQUALIZER;
+#else
+			goto not_there;
+#endif
 
 		break;
 
@@ -592,6 +706,30 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_OUTPUT_PORTS;
 		if (strEQ(name, "XA_MSG_NOTIFY_PROGRESS"))
 			return XA_MSG_NOTIFY_PROGRESS;
+		if (strEQ(name, "XA_NOTIFY_MASK_PROGRESS"))
+#ifdef XA_NOTIFY_MASK_PROGRESS
+			return XA_NOTIFY_MASK_PROGRESS;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_CAPS"))
+#ifdef XA_NOTIFY_MASK_INPUT_CAPS
+			return XA_NOTIFY_MASK_INPUT_CAPS;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_CAPS"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_CAPS
+			return XA_NOTIFY_MASK_OUTPUT_CAPS;
+#else
+			goto not_there;
+#endif
+		if (strEQ(name, "XA_NOTIFY_MASK_OUTPUT_PORTS"))
+#ifdef XA_NOTIFY_MASK_OUTPUT_PORTS
+			return XA_NOTIFY_MASK_OUTPUT_PORTS;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_SUCCESS"))
 #ifdef XA_SUCCESS
 			return XA_SUCCESS;
@@ -638,6 +776,12 @@ constant(char *name, int arg)
 			return XA_OUTPUT_CHANNELS_MONO_LEFT;
 		if (strEQ(name, "XA_OUTPUT_CHANNELS_MONO_RIGHT"))
 			return XA_OUTPUT_CHANNELS_MONO_RIGHT;
+		if (strEQ(name, "XA_NOTIFY_MASK_FEEDBACK_EVENT"))
+#ifdef XA_NOTIFY_MASK_FEEDBACK_EVENT
+			return XA_NOTIFY_MASK_FEEDBACK_EVENT;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_EXPORT"))
 #ifdef XA_EXPORT
 			return XA_EXPORT;
@@ -728,6 +872,12 @@ constant(char *name, int arg)
 			return XA_MSG_NOTIFY_READY;
 		if (strEQ(name, "XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY"))
 			return XA_MSG_NOTIFY_INPUT_TIMECODE_GRANULARITY;
+		if (strEQ(name, "XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY"))
+#ifdef XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY
+			return XA_NOTIFY_MASK_INPUT_TIMECODE_GRANULARITY;
+#else
+			goto not_there;
+#endif
 		if (strEQ(name, "XA_ERROR_OUT_OF_MEMORY"))
 #ifdef XA_ERROR_OUT_OF_MEMORY
 			return XA_ERROR_OUT_OF_MEMORY;
@@ -769,7 +919,6 @@ constant(char *name, int arg)
 	default:
 		break;
     }
-    printf ("DEBUG: %s jibbet nich\n", name);
     errno = EINVAL;
     return 0;
 
