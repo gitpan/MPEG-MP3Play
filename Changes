@@ -1,5 +1,10 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.06  Mon Sep 06 1999, joern
+	- fixed a memory leak in the get_message* methods.
+	  Thanks to Gene Senyszyn <scatt@goes.com> for the
+	  detailed bug report
+
 0.05  Mon Aug 09 1999, joern
 	- debugging implemented by providing default handlers
 	  for XA_MSG_NOTIFY_ACK and _NACK.

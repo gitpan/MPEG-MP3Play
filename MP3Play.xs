@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.12 1999/08/05 15:35:42 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.13 1999/09/06 19:43:33 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -196,37 +196,48 @@ CODE:
 
 #---- control_message_wait
 
-SV*
-control_message_wait (control, timeout)
+int
+control_message_wait (control, msg_href, timeout)
 	void *	control
+	SV *	msg_href
 	int	timeout
 
 	CODE:
 	XA_Message	msg;
 	int		status;
 	
-	ST(0) = sv_newmortal();
-
-#	printf ("timeout: %d\n", timeout);
 	status = control_message_wait (control, &msg, timeout);
-#	printf ("status: %d\n", status);
 
-	if ( status == XA_SUCCESS ) 
-		sv_setsv (ST(0),newRV_noinc((SV*)convert_message_to_HV (&msg)));
+	if ( status == XA_SUCCESS ) {
+		convert_message_to_HV (msg_href, &msg);
+		status = 1;
+	} else {
+		status = 0;
+	}
+
+	RETVAL = status;
 
 #---- control_message_get
 
-SV*
-control_message_get (control)
+int
+control_message_get (control, msg_href)
 	void *	control
+	SV *	msg_href
 
 	CODE:
 	XA_Message	msg;
-
-	ST(0) = sv_newmortal();
+	int		status;
 	
-	if ( control_message_get (control, &msg) ) 
-		sv_setsv (ST(0),newRV_noinc((SV*)convert_message_to_HV (&msg)));
+	status = control_message_get (control, &msg);
+
+	if ( status == XA_SUCCESS ) {
+		convert_message_to_HV (msg_href, &msg);
+		status = 1;
+	} else {
+		status = 0;
+	}
+
+	RETVAL = status;
 
 #---- command_read_pipe
 
@@ -239,3 +250,52 @@ command_read_pipe (control)
 	
 	OUTPUT:
 	RETVAL
+
+
+#---- memory leak test sub
+
+#SV*
+#test_hash_return(void)
+#
+#	CODE:
+#	HV*	msg_hash;
+#	msg_hash = newHV();
+#	
+#	hv_store (msg_hash,
+#		"code", 4,
+#		newSViv (42),
+#		0
+#	);
+#
+#	ST(0) = sv_newmortal();
+#	sv_setsv (ST(0),newRV_noinc(msg_hash));
+#
+#
+#SV*
+#test_scalar_return(void)
+#
+#	CODE:
+#	SV*	test;
+#
+#	test = newSViv(42);
+#
+#	ST(0) = sv_newmortal();
+#
+#	sv_setsv (ST(0),newRV_noinc(test);
+
+
+void
+test_hash_set (href)
+	SV *	href
+
+	CODE:
+	HV*	hash;
+	
+	hash = (HV*) SvRV(href);
+	
+	hv_store (hash,
+		"code", 4,
+		newSViv (42),
+		0
+	);
+

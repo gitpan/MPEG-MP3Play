@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.27 1999/08/08 12:37:55 joern Exp $
+# $Id: MP3Play.pm,v 1.29 1999/09/06 19:43:32 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -630,26 +630,30 @@ sub volume {
 
 sub get_message {
 	my $self = shift;
-
-	my $msg = control_message_get (
+	my %msg_hash;
+	
+	control_message_get (
+		\%msg_hash,
 		$self->{player}
 	);
 
-	return $msg;	
+	return \%msg_hash;
 }
 
 sub get_message_wait {
 	my $self = shift;
 	my ($timeout) = @_;
-
+	my %msg_hash;
+	
 	$timeout ||= &XA_TIMEOUT_INFINITE;
 
-	my $msg = control_message_wait (
+	control_message_wait (
 		$self->{player},
+		\%msg_hash,
 		$timeout
 	);
 
-	return $msg;	
+	return \%msg_hash;	
 }
 
 sub set_notification_mask {
