@@ -1,4 +1,4 @@
-/* $Id: MP3Play.xs,v 1.16 1999/09/08 08:43:32 joern Exp $ */
+/* $Id: MP3Play.xs,v 1.17 1999/09/21 21:49:21 joern Exp $ */
  
 #include "EXTERN.h"
 #include "perl.h"
@@ -211,7 +211,7 @@ control_message_wait (control, timeout)
 	if ( control_message_wait (control, &msg, timeout) == XA_SUCCESS ) {
 		RETVAL = convert_message_to_HV (&msg);
 	} else {
-		RETVAL = &PL_sv_undef;
+		RETVAL = newSViv(0);
 	}
 
 	OUTPUT:
@@ -229,7 +229,7 @@ control_message_get (control)
 	if ( control_message_get (control, &msg) > 0 ) {
 		RETVAL = convert_message_to_HV (&msg);
 	} else {
-		RETVAL = &PL_sv_undef;
+		RETVAL = newSViv(0);
 	}
 
 	OUTPUT:

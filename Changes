@@ -1,5 +1,14 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.08  Tue Sep 21 1999, joern
+	- Bugfix: MP3Play.xs did not compile with Perl 5.004_04, thanks
+	  to Dermot Musgrove <dermot@glade.perl.connectfree.co.uk>
+	  for his detailed bug report. Now MPEG::MP3Play should
+	  work with all Perl versions better or equal than 5.004_04.
+	  Testers are welcome.
+	- added a section about REPORTING BUGS in the documentation
+	  to make my life easier ;)
+
 0.07  Wed Sep 08 1999, joern
 	- Bugfix: $mp3->get_message was broken in Version 0.06,
 	  among other things the gtk* samples suffered from this

@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.32 1999/09/08 08:43:31 joern Exp $
+# $Id: MP3Play.pm,v 1.34 1999/09/21 21:49:20 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -633,7 +633,7 @@ sub get_message {
 	
 	return control_message_get (
 		$self->{player}
-	);
+	) || undef;
 }
 
 sub get_message_wait {
@@ -645,7 +645,8 @@ sub get_message_wait {
 	return control_message_wait (
 		$self->{player},
 		$timeout
-	);
+	) || undef;
+	
 }
 
 sub set_notification_mask {
@@ -869,6 +870,9 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
+This README and the documention cover version 0.08 of the
+MPEG::MP3Play module.
+
 =head1 PREREQUISITES
 
 B<Xaudio SDK>
@@ -893,6 +897,19 @@ B<Optionally used Perl modules>
   samples/handler.pl requires Term::ReadKey.
   samples/gtk*.pl require Gtk.
 
+=head1 DOWNLOADING
+
+You can download MPEG::MP3Play from any CPAN mirror. You will
+find it in the following directories:
+
+  http://www.perl.com/CPAN/modules/by-module/MPEG/
+  http://www.perl.com/CPAN/modules/by-authors/id/J/JR/JRED/
+
+You'll also find recent information and download links on
+my homepage:
+
+  http://www.netcologne.de/~nc-joernre/
+
 =head1 INSTALLATION
 
 First, generate the Makefile:
@@ -909,6 +926,7 @@ and library files are installed.
   ./runsample handler.pl
   ./runsample gtk.pl
   ./runsample gtkhandler.pl
+  ./runsample synopsis.pl
   make install
 
 =head1 SAMPLE SCRIPTS
@@ -1405,8 +1423,7 @@ use $mp3->set_notification_mask or $mp3->set_player_mode!
 
 =head1 TODO
 
-  - Testing of all methods.
-  - Testing under Win32
+  - Win32 support
   - support of the full Xaudio API, with input/output
     modules, etc.
   - documentation: more details about the messages
@@ -1419,19 +1436,61 @@ Ideas, code and any help are very appreciated.
 
   - samples/gtk*.pl throw some Gdk messages on exit.
     (not really a MPEG::MP3Play bug, I fear it documents
-     that I'm a beginner in coding Gtk+ applications ;)
+    that I'm a beginner in coding Gtk+ applications ;)
+    Who is able to fix this and is so kind to send me the
+    patch? ;)
   - the runsample script currently works only under
     Unix, it will fail under Win32
 
-If you find a bug please send me a report. I will fix
-this as soon as possible. Also I'm very interested to know,
-if someone write applications based on this module. So
-don't hesitate to send me an email, if you like (or not like ;)
-this module.
+=head1 REPORTING BUGS
+
+First check if you're using the most recent version of this
+module, maybe the bug you're about to report is already
+fixed.
+
+If you find a bug please send me a report. I will fix this as
+soon as possible. You'll make my life easier if you provide
+the following information along with your bugreport:
+
+  - your OS and Perl version (please send me the output
+    of 'perl -V')
+  - exact version number of the Xaudio development kit
+    you're using (including libc version, if matters)
+  - for bug reports regarding the GTK+ functionality
+    I need the version number of your GTK+ library and
+    the version number of your Perl Gtk module.
+
+If you have a solution to fix the bug you're welcome to
+send me a unified context diff of your changes, so I can
+apply them to the trunk. You'll get a credit in the Changes
+file.
+
+If you have problems with your soundsystem (you hear nothing,
+or the sound is chopped up) please try to compile the sample
+programs that are part of the Xaudio development kit. Do they
+work properly? If not, this is most likely a problem of your
+sound configuration and not a MPEG::MP3Play issue. Please check
+the Xaudio documentation in this case, before contacting me.
+Thanks.
+
+=head1 MPEG::MP3PLay APPLICATIONS
+
+Also I'm very interested to know, if someone write applications
+based on this module. So don't hesitate to send me an email, if
+you like (or not like ;) this module.
+
+=head1 TESTED ENVIRONMENTS
+
+This section will list the environments where this module
+is known to function well:
+
+  - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
+    Linux 2.2.10, Xaudio SDK 3.01 glibc6,
+    gtk+ 1.2.3, Perl Gtk 0.5121
 
 =head1 AUTHOR
 
-Joern Reder, joern@netcologne.de
+Joern Reder <joern@netcologne.de>
 
 =head1 COPYRIGHT
 

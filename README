@@ -12,6 +12,9 @@ SYNOPSIS
 DESCRIPTION
     This Perl module enables you to playback MPEG music.
 
+    This README and the documention cover version 0.08 of the
+    MPEG::MP3Play module.
+
 PREREQUISITES
     Xaudio SDK
 
@@ -35,6 +38,18 @@ PREREQUISITES
       samples/handler.pl requires Term::ReadKey.
       samples/gtk*.pl require Gtk.
 
+DOWNLOADING
+    You can download MPEG::MP3Play from any CPAN mirror. You will
+    find it in the following directories:
+
+      http://www.perl.com/CPAN/modules/by-module/MPEG/
+      http://www.perl.com/CPAN/modules/by-authors/id/J/JR/JRED/
+
+    You'll also find recent information and download links on my
+    homepage:
+
+      http://www.netcologne.de/~nc-joernre/
+
 INSTALLATION
     First, generate the Makefile:
 
@@ -50,6 +65,7 @@ INSTALLATION
       ./runsample handler.pl
       ./runsample gtk.pl
       ./runsample gtkhandler.pl
+      ./runsample synopsis.pl
       make install
 
 SAMPLE SCRIPTS
@@ -105,8 +121,7 @@ BASIC CONCEPT
     this module in its POD documentation.
 
 TODO
-      - Testing of all methods.
-      - Testing under Win32
+      - Win32 support
       - support of the full Xaudio API, with input/output
         modules, etc.
       - documentation: more details about the messages
@@ -118,17 +133,55 @@ TODO
 BUGS
       - samples/gtk*.pl throw some Gdk messages on exit.
         (not really a MPEG::MP3Play bug, I fear it documents
-         that I'm a beginner in coding Gtk+ applications ;)
+        that I'm a beginner in coding Gtk+ applications ;)
+        Who is able to fix this and is so kind to send me the
+        patch? ;)
       - the runsample script currently works only under
         Unix, it will fail under Win32
 
+REPORTING BUGS
+    First check if you're using the most recent version of this
+    module, maybe the bug you're about to report is already fixed.
+
     If you find a bug please send me a report. I will fix this as
-    soon as possible. Also I'm very interested to know, if someone
-    write applications based on this module. So don't hesitate to
-    send me an email, if you like (or not like ;) this module.
+    soon as possible. You'll make my life easier if you provide the
+    following information along with your bugreport:
+
+      - your OS and Perl version (please send me the output
+        of 'perl -V')
+      - exact version number of the Xaudio development kit
+        you're using (including libc version, if matters)
+      - for bug reports regarding the GTK+ functionality
+        I need the version number of your GTK+ library and
+        the version number of your Perl Gtk module.
+
+    If you have a solution to fix the bug you're welcome to send me
+    a unified context diff of your changes, so I can apply them to
+    the trunk. You'll get a credit in the Changes file.
+
+    If you have problems with your soundsystem (you hear nothing, or
+    the sound is chopped up) please try to compile the sample
+    programs that are part of the Xaudio development kit. Do they
+    work properly? If not, this is most likely a problem of your
+    sound configuration and not a MPEG::MP3Play issue. Please check
+    the Xaudio documentation in this case, before contacting me.
+    Thanks.
+
+MPEG::MP3PLay APPLICATIONS
+    Also I'm very interested to know, if someone write applications
+    based on this module. So don't hesitate to send me an email, if
+    you like (or not like ;) this module.
+
+TESTED ENVIRONMENTS
+    This section will list the environments where this module is
+    known to function well:
+
+      - Perl 5.005_03 and Perl 5.004_04, Linux 2.0.33 and
+        Linux 2.2.10, Xaudio SDK 3.01 glibc6,
+        gtk+ 1.2.3, Perl Gtk 0.5121
 
 AUTHOR
-    Joern Reder, joern@netcologne.de
+    Joern Reder <joern@netcologne.de>
 
 COPYRIGHT
     Copyright (C) 1999 by Joern Reder, All Rights Reserved.
@@ -144,6 +197,15 @@ SEE ALSO
 
 CHANGES
     Revision history for Perl extension MPEG::MP3Play.
+
+    0.08  Tue Sep 21 1999, joern
+	- Bugfix: MP3Play.xs did not compile with Perl 5.004_04, thanks
+	  to Dermot Musgrove <dermot@glade.perl.connectfree.co.uk>
+	  for his detailed bug report. Now MPEG::MP3Play should
+	  work with all Perl versions better or equal than 5.004_04.
+	  Testers are welcome.
+	- added a section about REPORTING BUGS in the documentation
+	  to make my life easier ;)
 
     0.07  Wed Sep 08 1999, joern
 	- Bugfix: $mp3->get_message was broken in Version 0.06,
