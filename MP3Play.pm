@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.40 1999/09/25 13:30:14 joern Exp $
+# $Id: MP3Play.pm,v 1.43 1999/10/09 16:04:17 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.09';
+$VERSION = '0.11';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -507,7 +507,11 @@ sub new {
 		debug => $par{'debug'} || ''
 	};
 	
-	return bless $self, $type;
+	bless $self, $type;
+	
+	$self->equalizer();
+	
+	return $self;
 }
 
 sub DESTROY {
@@ -626,6 +630,67 @@ sub volume {
 	) == &XA_SUCCESS;
 }
 
+sub equalizer {
+	my $self = shift;
+	
+	my ($left_lref, $right_lref) = @_;
+	
+	# disable the equalizer?
+	
+	if ( not defined $left_lref or
+	     not defined $right_lref ) {
+		return disable_equalizer_codec (
+			$self->{player}
+		) == &XA_SUCCESS;
+	}
+	
+	# parameter checking
+	
+	if ( @{$left_lref} != 32 or @{$right_lref} != 32 ) {
+		croak "invalid number of equalizer values passed";
+	}
+	
+	# check value band of -128 .. +127
+	my $ok = 1;
+	for (my $i=0; $ok and $i < 32; ++$i) {
+		$left_lref->[$i] = int($left_lref->[$i]);
+		$right_lref->[$i] = int($right_lref->[$i]);
+		$ok = 0 if $left_lref->[$i] < -128 or $left_lref->[$i] > 127 or
+		           $right_lref->[$i] < -128 or $right_lref->[$i] > 127;
+	}
+	
+	croak "invalid equalizer values passed" unless $ok;
+
+	# ok, all parameters are fine
+
+	my $eq_left  = pack('c32', @{$left_lref});
+	my $eq_right = pack('c32', @{$right_lref});
+
+	my $ret = control_message_send_S (
+		$self->{player},
+		&XA_MSG_SET_CODEC_EQUALIZER,
+		$eq_left.$eq_right
+	);
+        
+#	my $ret = set_equalizer_codec (
+#		$self->{player},
+#		$eq_left,
+#		$eq_right
+#	);
+	
+	return $ret == &XA_SUCCESS;
+}
+
+sub get_equalizer {
+	my $self = shift;
+	
+	control_message_send_N (
+		$self->{player},
+		&XA_MSG_GET_CODEC_EQUALIZER
+	) == &XA_SUCCESS;
+	
+}
+
 sub get_message {
 	my $self = shift;
 	
@@ -713,6 +778,7 @@ sub message_handler {
 	while ( 1 ) {
 		my $msg = $self->get_message_wait ($timeout);
 		if ( defined $msg ) {
+			$self->_convert_msg ($msg);
 			last if not $self->_process_message ($msg);
 			last if $msg->{code} == &XA_MSG_NOTIFY_EXITED;
 		}
@@ -721,6 +787,23 @@ sub message_handler {
 				_method_name => "work"
 			});
 		}
+	}
+}
+
+sub _convert_msg {
+	my $self = shift;
+	
+	my ($msg) = @_;
+	
+	# convert equalizer messages to make them more Perl'ish
+	if ( $msg->{code} == &XA_MSG_NOTIFY_CODEC_EQUALIZER ) {
+		my $eq = $msg->{'equalizer'};
+		my $left  = substr($eq,0,32);
+		my $right = substr($eq,32,32);
+		$msg->{'equalizer'} = {
+			left  => [ unpack('c32',$left) ],
+			right => [ unpack('c32',$right) ]
+		};
 	}
 }
 
@@ -868,7 +951,7 @@ MPEG::MP3Play - Perl extension for playing back MPEG music
 
 This Perl module enables you to playback MPEG music.
 
-This README and the documention cover version 0.09 of the
+This README and the documention cover version 0.11 of the
 MPEG::MP3Play module.
 
 =head1 PREREQUISITES
@@ -884,10 +967,10 @@ part of this distribution, so get and install it first
 
 B<Perl>
 
-I built and tested this module using Perl 5.005_03. It should
-work also with Perl 5.004_04 and above, but I did not test this.
-If someone builds MPEG::MP3Play successfully with other versions
-of Perl, plesase drop me a note.
+I built and tested this module using Perl 5.005_03 and Perl 5.004_04.
+It should work also with Perl 5.004_05, but I did not test this. If
+someone builds MPEG::MP3Play successfully with other versions of Perl,
+plesase drop me a note.
 
 B<Optionally used Perl modules>
 
@@ -947,12 +1030,12 @@ volume control with '+' and '-' keys.
 
 =item B<handler.pl>
 
-Does generally the same as play.pl, but uses the builtin
+Does nearly the same as play.pl, but uses the builtin
 message handler. You'll see, that this solution is much
 more elegant. It I<requires> Term::ReadKey.
 
-This script makes use of the debugging facility and
-is best documented so far.
+This script makes use of the debugging facility, the
+equalizer features and is best documented so far.
 
 =item B<gtk.pl>
 
@@ -1113,6 +1196,44 @@ is more right.
 You can supply undef for any parameter above and the corresponding
 value will not change.
 
+=item B<equalizer>
+
+$sent = $mp3->equalizer ( [ $left_eq_lref, $right_eq_lref ] )
+
+Use this method to control the builtin equalizer codec. If you
+omit any parameters, the equalizer will be deactivated, which
+preserves CPU time.
+
+The two array references for left and right channel must contain
+32 integer elements between -128 and +127. The method will croak
+an exception if you pass illegal values.
+
+=item B<get_equalizer>
+
+$sent = $mp3->get_equalizer
+
+This advises the Xaudio subsystem to send us a message back
+which contains the acual equalizer settings.
+
+The corresponding message handler method to handle the
+message is named
+
+  msg_notify_codec_equalizer
+
+See the chapter about the generic method handler for details
+about the message handling mechanism.
+
+The passed message hash will contain a key named 'equalizer',
+which is a hash reference with the following content:
+
+  equalizer => {
+    left  => $left_eq_lref,
+    right => $right_eq_lref
+  }
+
+The two lref's are arrays of 32 signed char values, see
+$self->equalizer.
+
 =item B<set_player_mode>
 
 $sent = $mp3->set_player_mode ( $flag, ... )
@@ -1138,6 +1259,9 @@ There are two methods to retrieve messages from
 the Xaudio subsystem. You can use them to implement
 your own message handler. Alternatively you can use
 the builtin message handler, described in the next chapter.
+Using the builtin message handler is recommended. Your
+programm looks better if you use it. Also the debugging
+facilitites of MPEG::MP3Play only work in this case.
 
 =over 8
 
@@ -1223,7 +1347,7 @@ This method returns the file descriptor of the internal
 message pipe as an integer. You can use this to monitor
 the message pipe for incoming messages, e.g. through
 Gdk in a Gtk application. See samples/gtk*.pl for an
-example about using this feature.
+example how to use this feature.
 
 =back
 
@@ -1489,7 +1613,11 @@ Ideas, code and any help are very appreciated.
 
 =head1 BUGS
 
-Currently there are no known bugs.
+  - treble control through the equalizer is weak. I checked
+    the sent data several times and cannot see any error
+    on my side, maybe something with my sound setup is strange,
+    or my ears are just broken :)
+    Please tell me, if the treble control is OK for you, or not.
 
 =head1 PROBLEMS AND REPORTING BUGS
 
@@ -1543,11 +1671,11 @@ is known to function well:
 
 =head1 AUTHOR
 
-Joern Reder <joern@netcologne.de>
+Joern Reder <joern@zyn.de>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1999 by Joern Reder, All Rights Reserved.
+Copyright (C) 1999-2000 by Joern Reder, All Rights Reserved.
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

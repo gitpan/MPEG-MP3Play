@@ -79,8 +79,8 @@ sub gen_conf_msg {
 		print "name\t$name\n";
 		print Dumper(\%par), "\n";
 		
-		gen_message_block ($out_fh, $name, \%par)
-			if $name ne 'XA_MSG_NOTIFY_CODEC_EQUALIZER';
+		gen_message_block ($out_fh, $name, \%par);
+#			if $name ne 'XA_MSG_NOTIFY_CODEC_EQUALIZER';
 	
 		++$i
 	}
@@ -150,6 +150,8 @@ sub gen_message_block {
 	$method_name =~ s/^XA_//;
 	$method_name =~ tr/A-Z/a-z/;
 	
+	$method_name = "equalizer" if $method_name eq 'equalizer_info';
+	
 	print $fh qq{\t\tcase $name:\n};
 
 	print $fh qq{\t\t\thv_store (msg_hash,\n};
@@ -161,6 +163,7 @@ sub gen_message_block {
 	while ( ($var,$type) = each %{$par} ) {
 		my $hash_var = $var;
 		$hash_var =~ s/\./_/g;
+		$hash_var = "equalizer" if $hash_var eq 'equalizer_info';
 		
 		print $fh qq{\t\t\thv_store (msg_hash,\n};
 		print $fh qq{\t\t\t\t"$hash_var", }.(length($hash_var)).qq{,\n};
@@ -174,6 +177,11 @@ sub gen_message_block {
 			  $type eq 'unsigned short' ) {
 			print $fh qq{\t\t\t\t}.
 				  qq{newSViv ((IV)message->data.$var),};
+		} elsif ( $type =~ /equalizer/ ) {
+			print $fh qq{\t\t\t\t}.
+				  qq{newSVpv ((char*)message->data.equalizer, 64),};
+		} else {
+			die "UNKNOWN TYPE: $type\n";
 		}
 		print $fh qq{\n\t\t\t\t0);\n};
 	}

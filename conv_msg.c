@@ -523,6 +523,17 @@ convert_message_to_HV ( XA_Message* message ) {
 				0);
 			break;
 
+		case XA_MSG_NOTIFY_CODEC_EQUALIZER:
+			hv_store (msg_hash,
+				"_method_name", 12,
+				newSVpv("msg_notify_codec_equalizer", 0),
+				0);
+			hv_store (msg_hash,
+				"equalizer", 9,
+				newSVpv ((char*)message->data.equalizer, 64),
+				0);
+			break;
+
 		case XA_MSG_NOTIFY_NOTIFICATION_MASK:
 			hv_store (msg_hash,
 				"_method_name", 12,

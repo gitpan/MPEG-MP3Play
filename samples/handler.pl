@@ -11,6 +11,9 @@ main: {
 	# usage
 	print "function keys:\n";
 	print "\t+/-\tvolume control\n";
+	print "\tb/B less/more bass\n";
+	print "\tt/T less/more treble\n";
+	print "\te/E equalizer on/off\n";
 	print "\ts\tstop playing\n";
 	print "\tm\tpause (mute)\n";
 	print "\tp\tstart playing\n";
@@ -27,6 +30,9 @@ main: {
 	# setting user data: our volume state
 	$mp3->set_user_data ({
 		volume => 50,
+		bass => 0,
+		treble => 0,
+		'eq' => '1',
 		debug => 'on'
 	});
 
@@ -73,13 +79,18 @@ sub work {
 	# read a key, non blocking
 	my $key = Term::ReadKey::ReadKey(-1) || '';
 
-	# return false if 'q' is pressed. The builtin message
-	# exits on false.
+	# return false if 'q' is pressed. The builtin message handler
+	# exits on false, so our application will exit, too.
 	return if $key eq 'q';
 
 	# volume control
 	my $data = $mp3->get_user_data;
+
+#	use Data::Dumper; print Dumper($data);
+
 	my $volume = $data->{'volume'};
+	my $bass = $data->{'bass'};
+	my $treble = $data->{'treble'};
 
 	if ( $key eq '+' ) {
 		$volume += 5;
@@ -110,12 +121,53 @@ sub work {
 			$data->{'debug'} = 'on';
 			print "debugging is on\n";
 		}
+	} elsif ( $key eq 'b' ) {
+		--$bass;
+		$bass = -10 if $bass < -10;
+		set_eq ($mp3, $bass, $treble);
+	} elsif ( $key eq 'B' ) {
+		++$bass;
+		$bass = 10 if $bass > 10;
+		set_eq ($mp3, $bass, $treble);
+	} elsif ( $key eq 't' ) {
+		--$treble;
+		$treble = -10 if $treble < -10;
+		set_eq ($mp3, $bass, $treble);
+	} elsif ( $key eq 'T' ) {
+		++$treble;
+		$treble = 10 if $treble > 10;
+		set_eq ($mp3, $bass, $treble);
+	} elsif ( $key eq 'e' ) {
+		print "eq off\n";
+		$mp3->equalizer();
+	} elsif ( $key eq 'E' ) {
+		set_eq ($mp3, $bass, $treble);
 	}
 	
 	$data->{'volume'} = $volume;
+	$data->{'bass'} = $bass;
+	$data->{'treble'} = $treble;
 
 	# always return true in a message handler
 	1;
+}
+
+sub set_eq {
+	my ($mp3, $bass, $treble) = @_;
+	
+#	print "bass=$bass treble=$treble\n";
+	
+	my $bass_max = $bass*12;
+	my $treble_max = $treble*12;
+	
+	my @eq = (0) x 32;
+	for (my $i=0; $i < 10; ++$i) {
+		$eq[9-$i] = $bass_max * $i / 10;
+		$eq[22+$i] = $treble_max * $i / 10;
+	}
+	
+	$mp3->equalizer ( \@eq, \@eq );
+	$mp3->get_equalizer;
 }
 
 sub msg_notify_input_timecode {
@@ -133,3 +185,11 @@ sub msg_notify_input_timecode {
 	1;
 }
 
+sub msg_notify_codec_equalizer {
+	my ($mp3, $msg) = @_;
+	
+	my $eq = $msg->{'equalizer'};
+
+	print "EQ: ", join (" ", @{$eq->{left}}), "\n";
+
+}
