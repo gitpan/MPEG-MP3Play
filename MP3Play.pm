@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.44 2000/09/29 16:42:02 joern Exp $
+# $Id: MP3Play.pm,v 1.45 2001/01/05 13:23:43 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -958,17 +958,32 @@ MPEG::MP3Play module.
 
 B<Xaudio SDK>
 
-MPEG::MP3Play is build against the 3.0 version of the Xaudio SDK
+MPEG::MP3Play is build against the 3.0.8 version of the Xaudio SDK
 and uses the async interface of the Xaudio library.
 
 I don't know if older versions will work properly. The SDK is not
 part of this distribution, so get and install it first
 (http://www.xaudio.com/).
 
+B<ATTENTION: Xaudio Versions 3.2.x DO ACTUALLY NOT WORK>
+
+Unfortunately Xaudio changed some internals of the API. These
+changes are actually bad documented, so it's hard for me to
+adjust MPEG::MP3Play. Please use 3.0.8 meanwhile.
+
+For Linux Users:
+
+Xaudio removed the 3.0.8 Linux version from their developers page.
+Please read and agree to the license restrictions under
+http://www.xaudio.com/developers/license.php and download the
+package from here:
+
+  http://www.netcologne.de/~nc-joernre/-/xasdk-3.0.8.x86-unknown-linux-glibc.tar.gz
+
 B<Perl>
 
 I built and tested this module using Perl 5.005_03 and Perl 5.004_04.
-It should work also with Perl 5.004_05, but I did not test this. If
+It should work also with Perl 5.004_05 and Perl 5.6, but I did not test this. If
 someone builds MPEG::MP3Play successfully with other versions of Perl,
 plesase drop me a note.
 
@@ -1424,7 +1439,7 @@ It throws the message mentioned above.
 B<Doing some work>
 
 If the parameter $timeout is set when calling
-$mp3->method_handler, $mp3->get_message_wait
+$mp3->message_handler, $mp3->get_message_wait
 is called with this timeout value. Additionally the method
 B<$mp3-E<gt>work> ist invoked after waiting or processing
 messages, so you can implement some logic
