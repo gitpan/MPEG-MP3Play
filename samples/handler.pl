@@ -8,15 +8,26 @@ main: {
 	# no output buffering
 	$| = 1;
 
+	# usage
+	print "function keys:\n";
+	print "\t+/-\tvolume control\n";
+	print "\ts\tstop playing\n";
+	print "\tm\tpause (mute)\n";
+	print "\tp\tstart playing\n";
+	print "\td\ttoggle debugging\n";
+
 	# non blocking input
 	ReadMode(4);
 	
 	# creation of a new player
-	my $mp3 = new MPEG::MP3Play;
+	my $mp3 = new MPEG::MP3Play (
+		debug => 'all'
+	);
 	
 	# setting user data: our volume state
 	$mp3->set_user_data ({
-		volume => 50
+		volume => 50,
+		debug => 'on'
 	});
 
 	# open and play the file
@@ -74,10 +85,31 @@ sub work {
 		$volume += 5;
 		$volume = 100 if $volume > 100;
 		$mp3->volume ($volume);
+		print "\n" if $data->{debug} eq 'on';
 	} elsif ( $key eq '-' ) {
 		$volume -= 5;
 		$volume = 0 if $volume < 0;
 		$mp3->volume ($volume);
+		print "\n" if $data->{debug} eq 'on';
+	} elsif ( $key eq 's' ) {
+		$mp3->stop;
+		print "\n" if $data->{debug} eq 'on';
+	} elsif ( $key eq 'm' ) {
+		$mp3->pause;
+		print "\n" if $data->{debug} eq 'on';
+	} elsif ( $key eq 'p' ) {
+		$mp3->play;
+		print "\n" if $data->{debug} eq 'on';
+	} elsif ( $key eq 'd' ) {
+		if ( $data->{debug} eq 'on' ) {
+			$mp3->debug ('none');
+			$data->{debug} = 'off';
+			print "debugging is off\n";
+		} else {
+			$mp3->debug ('all');
+			$data->{debug} = 'on';
+			print "debugging is on\n";
+		}
 	}
 	
 	$data->{volume} = $volume;

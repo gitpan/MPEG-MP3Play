@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.25 1999/08/07 12:22:36 joern Exp $
+# $Id: MP3Play.pm,v 1.27 1999/08/08 12:37:55 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 @ISA = qw(Exporter DynaLoader);
 
@@ -498,9 +498,15 @@ bootstrap MPEG::MP3Play $VERSION;
 
 sub new {
 	my $type = shift;
+	my %par = @_;
+	
+	croak "debug => { 'err' | 'all' }"
+		if $par{debug} and $par{debug} ne 'err'
+			       and $par{debug} ne 'all';
 	
 	my $self = {
-		player => new_player()
+		player => new_player(),
+		debug => $par{debug}
 	};
 	
 	return bless $self, $type;
@@ -510,6 +516,21 @@ sub DESTROY {
 	my $self = shift;
 	
 	destroy_player ($self->{player});
+}
+
+sub debug {
+	my $self = shift;
+	
+	my ($debug) = @_;
+	
+	croak "debug => { 'err' | 'all' | 'none' | '' }"
+		if $debug ne '' and $debug ne 'err' and
+		   $debug ne 'all' and $debug ne 'none';
+	$debug = '' if $debug eq 'none';
+
+	$self->{debug} = $debug;
+
+	1;
 }
 
 sub open {
@@ -635,6 +656,12 @@ sub set_notification_mask {
 	my $self = shift;
 	
 	my $mask = 0;
+	
+	if ( $self->{debug} ) {
+		$mask  = &XA_NOTIFY_MASK_NACK;
+		$mask |= &XA_NOTIFY_MASK_ACK if $self->{debug} eq 'all';
+	}
+	
 	for (@_) { $mask |= $_ }
 	
 	$self->{notification_mask} = $mask;
@@ -665,6 +692,22 @@ sub get_command_read_pipe {
 	my $self = shift;
 	
 	return command_read_pipe ($self->{player});
+}
+
+sub set_user_data {
+	my $self = shift;
+
+	my ($data) = @_;
+
+	$self->{user_data} = $data;
+	
+	1;
+}
+
+sub get_user_data {
+	my $self = shift;
+
+	return $self->{user_data};
 }
 
 sub message_handler {
@@ -712,20 +755,58 @@ sub _process_message {
 	return $retval;
 }
 
-sub set_user_data {
-	my $self = shift;
+{
+	# this is for caching message names
+	my %MESSAGE_NAME;
+	my $MESSAGE_NAME_BUILT;
 
-	my ($data) = @_;
-
-	$self->{user_data} = $data;
+	sub _message_name {
+		my $self = shift;
 	
-	1;
+		my ($code) = @_;
+	
+		# return message name if available
+		return $MESSAGE_NAME{$code} if $MESSAGE_NAME_BUILT;
+		
+		# ok, first build %MESSAGE_NAME
+		my $eval;
+		foreach my $msg (@{$EXPORT_TAGS{msg}}) {
+			$eval .= qq{\$MESSAGE_NAME{&$msg} = '$msg';\n};
+		}
+		eval $eval;
+		
+		$MESSAGE_NAME_BUILT = 1;
+		
+		# now return message name
+		return $MESSAGE_NAME{$code};
+	}
 }
 
-sub get_user_data {
-	my $self = shift;
+{
+	# this is for caching error names
+	my %ERROR_NAME;
+	my $ERROR_NAME_BUILT;
 
-	return $self->{user_data};
+	sub _error_name {
+		my $self = shift;
+	
+		my ($code) = @_;
+	
+		# return error name if available
+		return $ERROR_NAME{$code} if $ERROR_NAME_BUILT;
+		
+		# ok, first build %ERROR_NAME
+		my $eval;
+		foreach my $err (@{$EXPORT_TAGS{error}}) {
+			$eval .= qq{\$ERROR_NAME{&$err} = '$err';\n};
+		}
+		eval $eval;
+		
+		$ERROR_NAME_BUILT = 1;
+
+		# now return error name
+		return $ERROR_NAME{$code};
+	}
 }
 
 # default message handlers
@@ -736,6 +817,37 @@ sub msg_notify_player_state {
 	
 	# return false on EOF, so the message handler will exit
 	return if $msg->{state} == &XA_PLAYER_STATE_EOF;
+
+	# always return true in a message handler
+	1;
+}
+
+sub msg_notify_ack {
+	my $self = shift;
+
+	return 1 if not $self->{debug} eq 'all';
+	
+	my ($msg) = @_;
+	
+	my $msg_name = $self->_message_name ($msg->{ack});
+
+	carp "message '$msg_name' acknowledged";
+
+	# always return true in a message handler
+	1;
+}
+
+sub msg_notify_nack {
+	my $self = shift;
+
+	return 1 if not $self->{debug};
+	
+	my ($msg) = @_;
+	
+	my $msg_name = $self->_message_name ($msg->{nack_command});
+	my $err_name = $self->_error_name ($msg->{nack_code});
+
+	carp "message '$msg_name' error: $err_name";
 
 	# always return true in a message handler
 	1;
@@ -822,11 +934,12 @@ volume control with '+' and '-' keys.
 
 =item B<handler.pl>
 
-Does exactly the same as play.pl, but uses the builtin
+Does generally the same as play.pl, but uses the builtin
 message handler. You'll see, that this solution is much
-more elegant. I<Requires> Term::ReadKey.
+more elegant. It I<requires> Term::ReadKey.
 
-This script is best documented so far.
+This script makes use of the debugging facility and
+is best documented so far.
 
 =item B<gtk.pl>
 
@@ -848,15 +961,52 @@ I<really> works ;)
 
 =back
 
-=head1 CONSTRUCTOR
+=head1 BASIC CONCEPT
+
+The concept of the Xaudio async API is based on forking
+an extra process (or thread) for the MPEG decoding and
+playing. The parent process controls this process
+by sending and recieving messages. This message passing
+is asynchronous.
+
+This module interface provides methods for sending common messages
+to the MPEG process, eg. play, pause, stop. Also
+it implements a message handler to process the messages sent
+back. Eg. every message sent to the subprocess will be
+acknowledged by sending back an XA_MSG_NOTIFY_ACK message (or
+XA_MSG_NOTIFY_NACK on error). Error handling must be set up
+by handling this messages.
+
+=head1 CONSTRUCTOR / DEBUGGING
 
 =over 8
 
 =item B<new>
 
-$mp3 = new MPEG::MP3Play;
+$mp3 = new MPEG::MP3Play (
+    [ debug => 'err' | 'all' ]
+ );
 
-This is the constructor of this class and takes no arguments.
+This is the constructor of this class. It optionally takes
+the argument 'debug' to set a debugging level. If debugging
+is set to 'err', XA_MSG_NOTIFY_NACK messages will be carp'ed.
+Additionally XA_MSG_NOTIFY_ACK messages will be carp'ed if
+debugging is set to 'all'.
+
+The debugging is implemented by the methods B<msg_notify_ack>
+and B<msg_notify_nack> and works only if you use the builtin
+message handler. You can overload them to set up a private error
+handling (see chapter USING THE BUILTIN MESSAGE HANDLER for
+details)
+
+=item B<debug>
+
+$mp3->debug (
+    'err' | 'all' | 'none' | ''
+ );
+
+With this method you can set the debugging level at any time.
+If you pass an empty string or 'none' debugging will be disabled.
 
 =back
 
@@ -1036,6 +1186,12 @@ Valid notification mask flags are:
   XA_NOTIFY_MASK_CODEC_EQUALIZER 
   XA_NOTIFY_MASK_FEEDBACK_EVENT 
 
+B<Note:>
+
+If debugging is set to 'err' you cannot unset the XA_NOTIFY_MASK_NACK
+flag. If debugging ist set to 'all' also unsetting XA_NOTIFY_MASK_NACK
+is impossible.
+
 =item B<get_command_read_pipe>
 
 $read_fd = $mp3->get_command_read_pipe;
@@ -1051,7 +1207,7 @@ example about using this feature.
 =head1 USING THE BUILTIN MESSAGE HANDLER
 
 You can implement your own message handler based upon the
-two methods above. In many cases its easier to use
+methods described above. In many cases its easier to use
 the builtin message handler.
 
 =over 8
@@ -1186,6 +1342,17 @@ own functionality.
 If the current file reaches EOF this handler returns false,
 so the message handler will exit.
 
+=item B<msg_notify_ack>
+
+If debugging is set to 'all' this handler will print the
+acknowledged message using carp.
+
+=item B<msg_notify_nack>
+
+If debugging is set to 'err' or 'all' this handler will
+print the not acknowledged message plus an error string
+using carp.
+
 =back
 
 =head1 CONSTANTS
@@ -1255,14 +1422,14 @@ Ideas, code and any help are very appreciated.
 =head1 BUGS
 
   - samples/gtk*.pl throw some Gdk messages on exit.
-    (not really a MPEG::MP3Play bug, it documents that
-     I'm a beginner in coding Gtk+ applications ;)
+    (not really a MPEG::MP3Play bug, I fear it documents
+     that I'm a beginner in coding Gtk+ applications ;)
   - the runsample script currently works only under
     Unix, it will fail under Win32
 
-If you find bugs please send me a report. I will fix
-them as soon as possible. Also I'm very interested to know,
-if someone write applications based on this module, so
+If you find a bug please send me a report. I will fix
+this as soon as possible. Also I'm very interested to know,
+if someone write applications based on this module. So
 don't hesitate to send me an email, if you like (or not like ;)
 this module.
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension MPEG::MP3Play.
 
+0.05  Mon Aug 09 1999, joern
+	- debugging implemented by providing default handlers
+	  for XA_MSG_NOTIFY_ACK and _NACK.
+	- samples/handler.pl uses debugging for demonstration
+	  purposes
+
 0.04  Sat Aug 07 1999, joern
 	- implemented a builtin message handler mechanism.
 	  Message corresponding methods will be invoked,
