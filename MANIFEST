@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+MP3Play.pm
+MP3Play.xs
+Makefile.PL
+test.pl
+typemap

@@ -1,0 +1,7 @@
+Revision history for Perl extension MPEG::MP3Play.
+
+0.01  Sun Jul 25 20:56:18 1999
+	- original version; created by h2xs 1.19
+	- my first contact with XS, but playing mp3 files works
+	  after two hours. I like it! ;)
+	- no error handling at all
