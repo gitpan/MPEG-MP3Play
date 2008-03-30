@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use File::Copy;
 
-# $Id: Makefile.PL,v 1.10 2001/01/05 22:05:31 joern Exp $
+# $Id: Makefile.PL,v 1.12 2008/03/30 10:30:30 joern Exp $
 
 my $SDK_DIR = '/usr/local/xaudiosdk';
 
@@ -93,17 +93,15 @@ sub get_sdk_directory {
 	my $ok;
 	$sdk_dir = $SDK_DIR;
 
-	do {
-		print "Xaudio SDK directory [$sdk_dir] : ";
-		my $input;
-		chomp ($input = <STDIN>);
-		$sdk_dir = $input if $input;
-		$sdk_dir =~ s!/$!!;
-		$ok = -d "$sdk_dir/include" and -d "$sdk_dir/lib";
-		print "\nHmm, the directory must contain include and lib subdirectories.\n".
-		      "Try again or press Ctrl+C to abort.\n\n"
-			if not $ok;
-	} while ( not $ok );
+	my $input = prompt("Xaudio SDK directory [$sdk_dir] :");
+	$sdk_dir = $input if $input;
+	$ok = -d "$sdk_dir/include" and -d "$sdk_dir/lib";
+	exit 0 if !$input && !$ok;
+        if ( not $ok ) {
+          print "\nThe directory must contain include and lib subdirectories.\n";
+          print "Restart Makefile.PL and correct this.\n\n";
+          exit 0;
+        }
 
 	return $sdk_dir;
 }
@@ -129,7 +127,7 @@ sub get_sdk_version {
 	$minor    ||= '0';
 	$revision ||= '0';
 
-	print "Detected Xaudio SDK Implementation: $major.$minor.$revision\n";
+	print "Detected Xaudio SDK Implementation [$sdk_dir/include/xaudio.h]: $major.$minor.$revision\n";
 
 	return ($major, $minor, $revision);
 }

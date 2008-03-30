@@ -22,3 +22,4 @@ version/0.0/constants.h
 version/0.0/conv_msg.c
 version/2.2/constants.h
 version/2.2/conv_msg.c
+META.yml                                 Module meta-data (added by MakeMaker)

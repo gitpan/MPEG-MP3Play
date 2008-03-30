@@ -1,4 +1,4 @@
-# $Id: MP3Play.pm,v 1.48 2001/11/02 08:38:18 joern Exp $
+# $Id: MP3Play.pm,v 1.49 2008/03/30 10:26:13 joern Exp $
 
 package MPEG::MP3Play;
 
@@ -9,7 +9,7 @@ use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA $AUTOLOAD);
 require Exporter;
 require DynaLoader;
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 @ISA = qw(Exporter DynaLoader);
 

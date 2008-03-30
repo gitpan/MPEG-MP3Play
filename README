@@ -115,7 +115,7 @@ SAMPLE SCRIPTS
             itself. Advantage of using the builtin message handler: no
             global variables are necessary anymore.
 
-            Because 'runsample' uses '`perl -w'' you'll get a warning
+            Because 'runsample' uses '"perl -w"' you'll get a warning
             message here complaining about a subroutine redefinition. See
             the section USING THE BUILTIN MESSAGE HANDLER for a discussion
             about this.
@@ -222,9 +222,13 @@ SEE ALSO
     perl(1).
 
 CHANGES
-    $Id: Changes,v 1.28 2001/11/02 08:38:18 joern Exp $
+    $Id: Changes,v 1.29 2008/03/30 10:26:42 joern Exp $
 
     Revision history for Perl extension MPEG::MP3Play.
+
+    0.16  Sun Mar 30 2008, joern
+        - added patch from Yi Ma Mao for Makefile.PL so it conforms
+          to CPAN automated testing.
 
     0.15  Fri Nov 02 2001, joern
 	- removed debugging code from equalizer
